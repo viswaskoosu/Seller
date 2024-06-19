@@ -1,0 +1,136 @@
+.addresses {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.addresses .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  background-color: #f4f4f9;
+}
+
+.addresses .header h2 {
+  font-weight: 500;
+  font-size: 30px;
+  margin: 0;
+}
+.addresses .header h2:hover {
+color:#dc3545;
+}
+
+.add_address {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add_address:hover {
+  background-color: #0056b3;
+}
+
+.address_form {
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.address_form input[type="text"],
+.address_form select {
+  width: calc(100% - 22px);
+  padding: 8px;
+  margin: 10px 0; /* Increased spacing */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.address_form select {
+  cursor: pointer;
+}
+
+.address_form .error {
+  color: #dc3545;
+  font-size: 12px;
+}
+
+.save_button,
+.cancel_button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cancel_button {
+  background-color: #dc3545;
+}
+
+.save_button:hover,
+.cancel_button:hover {
+  filter: brightness(90%);
+}
+
+.address_item {
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  position: relative; /* Added position for effects */
+  overflow: hidden; /* Added to control overflow */
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.address_item:hover {
+  transform: translateY(-5px); /* Lift up effect on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Elevated shadow on hover */
+}
+
+.address_item p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.address_item .edit_button,
+.address_item .delete_button {
+  padding: 8px 12px;
+  margin-right: 8px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.address_item .delete_button {
+  background-color: #dc3545;
+}
+
+.address_item .edit_button:hover,
+.address_item .delete_button:hover {
+  filter: brightness(90%);
+}
+.address_item p{
+margin: 10px;
+font-size: medium;
+}

@@ -11,6 +11,7 @@ import axios from 'axios';
 import LoadingPage from './Pages/LoadingPage';
 import Header from './components/Header';
 import SellerAccountPage from './Pages/SellerAccountPage';
+import Addresses from './Pages/SellerAddresses';
 
 function App (){
   const [, dispatch] = useStateValue();
@@ -47,6 +48,7 @@ function App (){
         <Route path="/your-products" element={<YourProducts />} />
         <Route path="/selling-history" element={<SellingHistory />} />
         <Route path="/account" element={<SellerAccountPage />} />
+        {/* <Route path="/seller-addresses" element={<Addresses />} /> */}
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </Router>
