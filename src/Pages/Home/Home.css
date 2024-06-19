@@ -1,0 +1,24 @@
+/* Home.css */
+.home {
+    padding: 20px;
+  }
+  
+  .latest_products_title {
+    color: black;
+    font-size: x-large;
+    font-weight: 500;
+  }
+  
+  .latest_products_title:hover {
+    color: #DB4444;
+    cursor: pointer;
+  }
+  
+  .product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .latesh_product{
+    width: 100%;
+  }

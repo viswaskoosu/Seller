@@ -1,24 +1,55 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Home from './Pages/Home';
+import ProductDetail from './Pages/ProductDetail';
+import ErrorPage from './Pages/Error'; 
+import SellerDashboard from './Pages/SellerDashboard';
+import YourProducts from './Pages/YourProducts';
+import SellingHistory from './Pages/SellingHistory';
+import { useStateValue } from './Context/StateProvider';
+import axios from 'axios';
+import LoadingPage from './Pages/LoadingPage';
+import Header from './components/Header';
+import SellerAccountPage from './Pages/SellerAccountPage';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+function App (){
+  const [, dispatch] = useStateValue();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (window.location.pathname === '/error') return;
+    setIsLoading(true);
+    axios
+    .get(`${process.env.REACT_APP_API_URL}/product/fetchproducts`)
+    .then((response) => {
+        dispatch({
+          type: 'SET_PRODUCTS',
+          products: response.data,
+        });
+      })
+      .catch(() => {
+        window.location.replace('/error');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch]);
+
+  return isLoading ? (
+    <LoadingPage />
+  ) : (
+    <Router>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/product/:productId" element={<ProductDetail />} />
+        <Route path="/seller-dashboard" element={<SellerDashboard />} />
+        <Route path="/your-products" element={<YourProducts />} />
+        <Route path="/selling-history" element={<SellingHistory />} />
+        <Route path="/account" element={<SellerAccountPage />} />
+        <Route path="*" element={<ErrorPage />} />
+      </Routes>
+    </Router>
   );
 }
 
