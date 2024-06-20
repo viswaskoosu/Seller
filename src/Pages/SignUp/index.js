@@ -143,6 +143,7 @@ const SignUp = () => {
         // console.log(response.data)
         // if (response.data.success)
           // Cookies.set("token", response.data.token)
+          console.log(response.data.user)
         localStorage.setItem("user", JSON.stringify(response.data.user));
         toast.success("Signed up successfully");
         dispatch({

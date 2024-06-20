@@ -4,7 +4,7 @@ import reducer, { initialState } from '../reducer'; // Update import
 
 export const StateContext = createContext();
 
-export const StateProvider = ({ children }) => {
+export const StateProvider = ({ reducer, initialState, children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
