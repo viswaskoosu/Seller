@@ -11,14 +11,11 @@ import axios from 'axios';
 import LoadingPage from './Pages/LoadingPage';
 import Header from './components/Header';
 import SellerAccountPage from './Pages/SellerAccountPage';
-<<<<<<< HEAD
 import AddProduct from './Pages/AddProduct';
 import SignUp from './Pages/SignUp';
-=======
 import Addresses from './Pages/SellerAddresses';
 import ProductDetailInfo from './Pages/ProductDetailInfo';
 
->>>>>>> 4d2394d3aded169fc269614629f9e856686cb966
 function App (){
   const [, dispatch] = useStateValue();
   const [isLoading, setIsLoading] = useState(true);
