@@ -24,6 +24,7 @@ function App (){
     if (window.location.pathname === '/error') return;
     console.log(user)
     if (!user?.token){
+      setIsLoading(false)
       window.location.replace('/signup')
       return
     }
