@@ -1,0 +1,95 @@
+.product-detail {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+  }
+  
+  .product-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .product-detail-header h2 {
+    margin: 0;
+  }
+  
+  .edit-button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .edit-button:hover {
+    background-color: #45a049;
+  }
+  
+  .save-button,
+  .cancel-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  .save-button:hover,
+  .cancel-button:hover {
+    background-color: #da190b;
+  }
+  
+  .edit-form {
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 10px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  input[type="text"],
+  input[type="number"],
+  textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+  
+  textarea.resize-textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .specifications {
+    margin-top: 10px;
+  }
+  
+  .specification {
+    display: flex;
+    margin-bottom: 5px;
+  }
+  
+  .spec-input {
+    flex: 1;
+    margin-right: 5px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+  
+  

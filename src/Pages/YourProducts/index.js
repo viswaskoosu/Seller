@@ -6,15 +6,17 @@ import {useNavigate} from 'react-router-dom'
 const YourProducts = () => {
   const [{ products }, dispatch] = useStateValue();
   // console.log(products)
-  const sellerId = '66603c345186e77df89152ea';
+  const sellerId = '666b3653a34c6e81d0f94b0e';
   const [filteredProducts, setFilteredProducts] = useState([]);
+
   const [sortBy, setSortBy] = useState('');
   const navigate = useNavigate()
   useEffect(() => {
     const sellerProducts = products.filter(product => product.seller === sellerId);
     setFilteredProducts(sellerProducts);
   }, [products, sellerId]);
-
+console.log(sellerId)
+console.log(products)
   const handleSortChange = (sortType) => {
     setSortBy(sortType);
     switch (sortType) {

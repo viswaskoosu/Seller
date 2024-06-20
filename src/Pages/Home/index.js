@@ -6,14 +6,16 @@ import './Home.css';
 const Home = () => {
   const [{ products }, dispatch] = useStateValue();
   const [latestProducts, setLatestProducts] = useState([]);
-  console.log(products)
-  useEffect(() => {
-    // Sort products by date added and select the latest 20
-    const sortedProducts = products.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-    const latest20Products = sortedProducts.slice(0, 20);
-    setLatestProducts(latest20Products);
-  }, [products]);
+  const sellerId = '666b3653a34c6e81d0f94b0e';
 
+  useEffect(() => {
+    if (products.length > 0) {
+      const sellerProducts = products.filter(product => product.seller === sellerId);
+      const sortedProducts = sellerProducts.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+      const latest20Products = sortedProducts.slice(0, 20);
+      setLatestProducts(latest20Products);
+    }
+  }, [products, sellerId]);
   return (
     <div className="home">
       <h2 className="latest_products_title">Latest Products</h2>
