@@ -191,67 +191,64 @@ const SignUp = () => {
               Stage 0: Signup
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                  error={firstNameError}
-                  helperText={firstNameError}
-                  value={firstName}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
-                  error={lastNameError}
-                  helperText={lastNameError}
-                  value={lastName}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  inputProps={{
-                    type: "email",
-                  }}
-                  error={emailError}
-                  helperText={emailError}
-                  value={email}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                  error={passwordError}
-                  helperText={passwordError}
-                  value={password}
-                  onChange={handleChange}
-                />
-              </Grid>
+            <Grid item xs={12} sm={6}>
+                  <TextField
+                    autoComplete="given-name"
+                    name="firstName"
+                    required
+                    fullWidth
+                    id="firstName"
+                    label="First Name"
+                    autoFocus
+                    error={firstNameError}
+                    helperText={firstNameError}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="lastName"
+                    label="Last Name"
+                    name="lastName"
+                    autoComplete="family-name"
+                    error={lastNameError}
+                    helperText={lastNameError}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    inputProps={{
+                      type: "email",
+                    }}
+                    error={emailError}
+                    helperText={emailError}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="new-password"
+                    error={passwordError}
+                    helperText={passwordError}
+                    onChange={handleChange}
+                  />
+                </Grid>
             </Grid>
             <Box sx={{ mt: 2 }}>
               <Button variant="contained" onClick={handleNextStage}>
