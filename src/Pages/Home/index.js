@@ -6,7 +6,7 @@ import './Home.css';
 const Home = () => {
   const [{ products }, dispatch] = useStateValue();
   const [latestProducts, setLatestProducts] = useState([]);
-
+  console.log(products)
   useEffect(() => {
     // Sort products by date added and select the latest 20
     const sortedProducts = products.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));

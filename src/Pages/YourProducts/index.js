@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import SellerProduct from '../../components/SellerProduct';
 import './YourProducts.css';
 import { useStateValue } from '../../Context/StateProvider';
-
+import {useNavigate} from 'react-router-dom'
 const YourProducts = () => {
   const [{ products }, dispatch] = useStateValue();
+  // console.log(products)
   const sellerId = '66603c345186e77df89152ea';
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [sortBy, setSortBy] = useState('');
-
+  const navigate = useNavigate()
   useEffect(() => {
     const sellerProducts = products.filter(product => product.seller === sellerId);
     setFilteredProducts(sellerProducts);
@@ -67,7 +68,9 @@ const YourProducts = () => {
     const sellerProducts = products.filter(product => product.seller === sellerId);
     setFilteredProducts(sellerProducts);
   };
-
+  const handleAddProduct = () => {
+    navigate('/addproduct')
+  }
   return (
     <div className="your-products">
       <div className="filters">
@@ -82,7 +85,10 @@ const YourProducts = () => {
       </div>
 
       <div className="product-list">
+      <div className='add-new-product'>
         <h2 className="your_products_title">Your Products</h2>
+        <button className='add-product-button' onClick={handleAddProduct}>Add Product</button>
+      </div>
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
             <SellerProduct key={product.id} id={product.id} onUpdate={handleUpdate} />

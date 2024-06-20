@@ -11,7 +11,8 @@ import axios from 'axios';
 import LoadingPage from './Pages/LoadingPage';
 import Header from './components/Header';
 import SellerAccountPage from './Pages/SellerAccountPage';
-
+import AddProduct from './Pages/AddProduct';
+import SignUp from './Pages/SignUp';
 function App (){
   const [, dispatch] = useStateValue();
   const [isLoading, setIsLoading] = useState(true);
@@ -47,6 +48,8 @@ function App (){
         <Route path="/your-products" element={<YourProducts />} />
         <Route path="/selling-history" element={<SellingHistory />} />
         <Route path="/account" element={<SellerAccountPage />} />
+        <Route path="/addproduct" element={<AddProduct />} />
+        <Route path='/signup' element={<SignUp/>}/>
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </Router>
