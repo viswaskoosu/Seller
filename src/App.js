@@ -12,6 +12,7 @@ import LoadingPage from './Pages/LoadingPage';
 import Header from './components/Header';
 import SellerAccountPage from './Pages/SellerAccountPage';
 import Addresses from './Pages/SellerAddresses';
+import ProductDetailInfo from './Pages/ProductDetailInfo';
 
 function App (){
   const [, dispatch] = useStateValue();
@@ -44,6 +45,7 @@ function App (){
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/product/:productId" element={<ProductDetail />} />
+        <Route path="/product-preview/:productId" element={<ProductDetailInfo />} />
         <Route path="/seller-dashboard" element={<SellerDashboard />} />
         <Route path="/your-products" element={<YourProducts />} />
         <Route path="/selling-history" element={<SellingHistory />} />

@@ -1,11 +1,12 @@
 // src/Pages/ProductDetail.js
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useStateValue } from '../../Context/StateProvider';
 import { actionTypes } from '../../reducer';
 import './ProductDetail.css'; // Import CSS file
 import Carousel from '../../components/Carousel'; // Import Carousel component
+import ProductDetailInfo from '../ProductDetailInfo';
 
 const ProductDetail = () => {
   const { productId } = useParams();
@@ -223,36 +224,7 @@ const ProductDetail = () => {
           <button className='cancel-button' onClick={handleCancel}>Cancel</button>
         </div>
       ) : (
-        <div className='product-info'>
-          <Carousel images={product.images} />
-          <div className='info-group'>
-            <p><strong>Title:</strong> {product.title}</p>
-            <p><strong>Price:</strong> ₹{product.price}</p>
-            <p><strong>MRP:</strong> ₹{product.mrp}</p>
-            <p><strong>Category:</strong> {product.category}</p>
-            <p><strong>Description:</strong> {product.description}</p>
-            <p><strong>Available:</strong> {product.available}</p>
-            <p><strong>Tags:</strong></p>
-            <ul>
-              {product.tags.map((tag, index) => (
-                <li key={index}>{tag}</li>
-              ))}
-            </ul>
-            <p><strong>Key Features:</strong></p>
-            <ul>
-              {product.keyFeatures.map((feature, index) => (
-                <li key={index}>{feature}</li>
-              ))}
-            </ul>
-            <p><strong>Specifications:</strong></p>
-            <ul>
-              {Object.entries(product.specifications).map(([key, value], index) => (
-                <li key={index}><strong>{key}:</strong> {value}</li>
-              ))}
-            </ul>
-            <p><strong>Reviews:</strong> {product.reviews.length}</p>
-          </div>
-        </div>
+        <Link to={`/product-preview/${product.id}`}>View Product Details</Link>
       )}
     </div>
   );
