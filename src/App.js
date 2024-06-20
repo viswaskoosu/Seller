@@ -23,7 +23,9 @@ function App (){
   useEffect(() => {
     if (window.location.pathname === '/error') return;
     console.log(user)
-    if (!user?.token) return
+    if (!user?.token){
+      window.location.replace('/signup')
+    }
     setIsLoading(true);
     axios
     .get(`${process.env.REACT_APP_API_URL}/product/fetchproducts?seller=${user.token}`)
