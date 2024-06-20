@@ -17,14 +17,16 @@ import Addresses from './Pages/SellerAddresses';
 import ProductDetailInfo from './Pages/ProductDetailInfo';
 
 function App (){
-  const [, dispatch] = useStateValue();
+  const [{user}, dispatch] = useStateValue();
   const [isLoading, setIsLoading] = useState(true);
-
+  
   useEffect(() => {
     if (window.location.pathname === '/error') return;
+    console.log(user)
+    if (!user?.token) return
     setIsLoading(true);
     axios
-    .get(`${process.env.REACT_APP_API_URL}/product/fetchproducts`)
+    .get(`${process.env.REACT_APP_API_URL}/product/fetchproducts?seller=${user.token}`)
     .then((response) => {
         dispatch({
           type: 'SET_PRODUCTS',
