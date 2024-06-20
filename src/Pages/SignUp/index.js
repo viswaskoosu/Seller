@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate,  Link as RouterLink } from "react-router-dom";
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import {
   InputLabel,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
 import { useLocation } from "react-router-dom";
 import LoadingPage from "../LoadingPage";
 import {toast} from 'react-toastify'
@@ -385,6 +386,11 @@ const SignUp = () => {
           </Box>
         )}
       </Box>
+      <Grid item>
+                    <RouterLink to="/signin" component={Link} variant="body2">
+                      {"Already have an account? Signin"}
+                    </RouterLink>
+                  </Grid>
     </Container>
   );
 };

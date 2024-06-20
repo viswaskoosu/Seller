@@ -15,21 +15,22 @@ import AddProduct from "./Pages/AddProduct";
 import SignUp from "./Pages/SignUp";
 import Addresses from "./Pages/SellerAddresses";
 import ProductDetailInfo from "./Pages/ProductDetailInfo";
-
+import SignIn from "./Pages/SignIn";
+import {ToastContainer} from 'react-toastify'
 function App() {
   const [{ user }, dispatch] = useStateValue();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (window.location.pathname === "/error" || window.location.pathname==='/signup') {
+    if (window.location.pathname === "/error" || window.location.pathname==='/signup' || window.location.pathname==='/signin') {
       setIsLoading(false);
       return;
     }
     console.log(user);
     if (!user?.token) {
-      if (window.location.path !== "/signup") {
+      if (window.location.path !== "/signin") {
         setIsLoading(false);
-        window.location.replace("/signup");
+        window.location.replace("/signin");
       }
       return;
     }
@@ -72,9 +73,11 @@ function App() {
         <Route path="/addproduct" element={<AddProduct />} />
         <Route path="/signup" element={<SignUp />} />
         {/* <Route path="/seller-addresses" element={<Addresses />} /> */}
-
+        <Route path="/signin" element={<SignIn />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
+      <ToastContainer/>
+
     </Router>
   );
 }

@@ -15,12 +15,10 @@ function SellerAccountPage() {
 
   const logout = () => {
     localStorage.removeItem("user");
-    localStorage.removeItem("basket");
-
     dispatch({
       type: "USER_LOGOUT",
     });
-    navigate('/')
+    navigate('/signin')
   };
 
   const checkDP = () => {
