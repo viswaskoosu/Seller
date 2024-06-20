@@ -55,6 +55,7 @@ function App (){
         <Route path="/addproduct" element={<AddProduct />} />
         <Route path='/signup' element={<SignUp/>}/>
         {/* <Route path="/seller-addresses" element={<Addresses />} /> */}
+
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </Router>
