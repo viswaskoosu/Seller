@@ -1,45 +1,52 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './Pages/Home';
-import ProductDetail from './Pages/ProductDetail';
-import ErrorPage from './Pages/Error'; 
-import SellerDashboard from './Pages/SellerDashboard';
-import YourProducts from './Pages/YourProducts';
-import SellingHistory from './Pages/SellingHistory';
-import { useStateValue } from './Context/StateProvider';
-import axios from 'axios';
-import LoadingPage from './Pages/LoadingPage';
-import Header from './components/Header';
-import SellerAccountPage from './Pages/SellerAccountPage';
-import AddProduct from './Pages/AddProduct';
-import SignUp from './Pages/SignUp';
-import Addresses from './Pages/SellerAddresses';
-import ProductDetailInfo from './Pages/ProductDetailInfo';
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Home from "./Pages/Home";
+import ProductDetail from "./Pages/ProductDetail";
+import ErrorPage from "./Pages/Error";
+import SellerDashboard from "./Pages/SellerDashboard";
+import YourProducts from "./Pages/YourProducts";
+import SellingHistory from "./Pages/SellingHistory";
+import { useStateValue } from "./Context/StateProvider";
+import axios from "axios";
+import LoadingPage from "./Pages/LoadingPage";
+import Header from "./components/Header";
+import SellerAccountPage from "./Pages/SellerAccountPage";
+import AddProduct from "./Pages/AddProduct";
+import SignUp from "./Pages/SignUp";
+import Addresses from "./Pages/SellerAddresses";
+import ProductDetailInfo from "./Pages/ProductDetailInfo";
 
-function App (){
-  const [{user}, dispatch] = useStateValue();
+function App() {
+  const [{ user }, dispatch] = useStateValue();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (window.location.pathname === '/error') return;
-    console.log(user)
-    if (!user?.token){
-      setIsLoading(false)
-      window.location.replace('/signup')
-      return
+    if (window.location.pathname === "/error" || window.location.pathname==='/signup') {
+      setIsLoading(false);
+      return;
+    }
+    console.log(user);
+    if (!user?.token) {
+      if (window.location.path !== "/signup") {
+        setIsLoading(false);
+        window.location.replace("/signup");
+      }
+      return;
     }
     setIsLoading(true);
     axios
-    .get(`${process.env.REACT_APP_API_URL}/product/fetchproducts?seller=${user.token}`)
-    .then((response) => {
+      .get(
+        `${process.env.REACT_APP_API_URL}/product/fetchproducts?seller=${user.token}`
+      )
+      .then((response) => {
         dispatch({
-          type: 'SET_PRODUCTS',
+          type: "SET_PRODUCTS",
           products: response.data,
         });
       })
       .catch(() => {
-        setIsLoading(false)
-        window.location.replace('/error');
+        setIsLoading(false);
+        window.location.replace("/error");
       })
       .finally(() => {
         setIsLoading(false);
@@ -54,13 +61,16 @@ function App (){
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/product/:productId" element={<ProductDetail />} />
-        <Route path="/product-preview/:productId" element={<ProductDetailInfo />} />
+        <Route
+          path="/product-preview/:productId"
+          element={<ProductDetailInfo />}
+        />
         <Route path="/seller-dashboard" element={<SellerDashboard />} />
         <Route path="/your-products" element={<YourProducts />} />
         <Route path="/selling-history" element={<SellingHistory />} />
         <Route path="/account" element={<SellerAccountPage />} />
         <Route path="/addproduct" element={<AddProduct />} />
-        <Route path='/signup' element={<SignUp/>}/>
+        <Route path="/signup" element={<SignUp />} />
         {/* <Route path="/seller-addresses" element={<Addresses />} /> */}
 
         <Route path="*" element={<ErrorPage />} />
