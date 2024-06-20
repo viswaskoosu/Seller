@@ -25,6 +25,7 @@ function App (){
     console.log(user)
     if (!user?.token){
       window.location.replace('/signup')
+      return
     }
     setIsLoading(true);
     axios
