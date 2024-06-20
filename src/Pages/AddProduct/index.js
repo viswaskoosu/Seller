@@ -44,6 +44,13 @@ const AddProduct = () => {
     }));
   };
 
+  const handleDeleteSpecification = (index) => {
+    setNewProduct((prev) => ({
+      ...prev,
+      specifications: prev.specifications.filter((_, i) => i !== index),
+    }));
+  };
+
   const handleSave = () => {
     // Convert specifications array to object
     const specificationsObject = newProduct.specifications.reduce((acc, { key, value }) => {
@@ -183,6 +190,7 @@ const AddProduct = () => {
                   }
                   className="spec-input"
                 />
+                <button onClick={() => handleDeleteSpecification(index)} className="delete-spec-button">Delete</button>
               </div>
             ))}
             <button onClick={handleAddSpecification}>Add Specification</button>

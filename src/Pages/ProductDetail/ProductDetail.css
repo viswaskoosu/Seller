@@ -56,13 +56,13 @@
     display: block;
     margin-bottom: 5px;
   }
-  
+  .product-detail 
   input[type="text"],
   input[type="number"],
   textarea {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 14px;
