@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useStateValue } from "../../Context/StateProvider";
 import { actionTypes } from "../../reducer";
 import { useNavigate } from 'react-router-dom';
+import Categories from "../../Categories";
 import './AddProduct.css'; // Import CSS file for consistent styling
 
 const AddProduct = () => {
@@ -12,6 +13,7 @@ const AddProduct = () => {
     price: '',
     mrp: '',
     category: '',
+    customCategory: '',
     description: '',
     available: '',
     tags: [],
@@ -58,9 +60,11 @@ const AddProduct = () => {
       return acc;
     }, {});
 
+    const category = newProduct.category === 'Other' ? newProduct.customCategory : newProduct.category;
+
     dispatch({
       type: actionTypes.ADD_PRODUCT,
-      product: { ...newProduct, specifications: specificationsObject, dateAdded: new Date().toISOString() },
+      product: { ...newProduct, category, specifications: specificationsObject, dateAdded: new Date().toISOString() },
     });
     navigate('/your-products');
   };
@@ -104,12 +108,28 @@ const AddProduct = () => {
         </div>
         <div className="form-group">
           <label>Category:</label>
-          <input
-            type="text"
+          <select
             name="category"
             value={newProduct.category}
             onChange={handleInputChange}
-          />
+          >
+            <option value="">Select a category</option>
+            {Categories.map((cat, index) => (
+              <option key={index} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
+            <option value="Other">Other</option>
+          </select>
+          {newProduct.category === 'Other' && (
+            <input
+              type="text"
+              name="customCategory"
+              value={newProduct.customCategory}
+              onChange={handleInputChange}
+              placeholder="Enter custom category"
+            />
+          )}
         </div>
         <div className="form-group">
           <label>Description:</label>
