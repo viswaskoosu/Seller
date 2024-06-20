@@ -19,7 +19,7 @@ import ProductDetailInfo from './Pages/ProductDetailInfo';
 function App (){
   const [{user}, dispatch] = useStateValue();
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
     if (window.location.pathname === '/error') return;
     console.log(user)
@@ -34,6 +34,7 @@ function App (){
         });
       })
       .catch(() => {
+        setIsLoading(false)
         window.location.replace('/error');
       })
       .finally(() => {

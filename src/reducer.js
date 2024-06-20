@@ -1,10 +1,10 @@
-// export const initialState = {
-//   user: {displayName: 'nithin'},
-//   products: [],
-//   sellingHistory: [],
-//   userLoggedIn: false
-//   // sellingHistory:[],
-// };
+export const initialState = {
+  user: {displayName: 'nithin'},
+  products: [],
+  sellingHistory: [],
+  userLoggedIn: false
+  // sellingHistory:[],
+};
 
 export const actionTypes = {
   SET_USER: 'SET_USER',
