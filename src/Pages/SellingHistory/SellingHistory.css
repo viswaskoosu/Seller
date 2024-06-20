@@ -1,0 +1,69 @@
+/* Selling History Container */
+.selling-history-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-x: auto; /* Allow horizontal scrolling on smaller screens */
+  }
+  
+  /* Selling History Title */
+  .selling-history-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333333;
+  }
+  
+  /* Selling History Table */
+  .selling-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .selling-history-table th,
+  .selling-history-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Truncate text with ellipsis */
+  }
+  
+  .selling-history-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  .selling-history-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .selling-history-table tbody tr:hover {
+    background-color: #e9ecef;
+  }
+  
+  /* Link styling for product title */
+  .selling-history-table td a {
+    color: #007bff; /* Bootstrap's primary color */
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .selling-history-table td a:hover {
+    text-decoration: underline;
+  }
+  
+  @media only screen and (max-width: 768px) {
+    .selling-history-table th,
+    .selling-history-table td {
+      padding: 8px;
+      font-size: 14px;
+    }
+  }
+  
