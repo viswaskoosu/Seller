@@ -48,6 +48,21 @@ const ProductDetail = () => {
     }));
   };
 
+  const handleAddSpecification = () => {
+    setUpdatedProduct((prev) => ({
+      ...prev,
+      specifications: [...prev.specifications, { key: '', value: '' }],
+    }));
+  };
+
+  const handleDeleteSpecification = (index) => {
+    const newSpecifications = updatedProduct.specifications.filter((_, i) => i !== index);
+    setUpdatedProduct((prev) => ({
+      ...prev,
+      specifications: newSpecifications,
+    }));
+  };
+
   const handleSave = () => {
     // Convert specifications array back to an object
     const specificationsObject = updatedProduct.specifications.reduce((acc, { key, value }) => {
@@ -198,8 +213,10 @@ const ProductDetail = () => {
                     }
                     className='spec-input'
                   />
+                  <button onClick={() => handleDeleteSpecification(index)}>Delete</button>
                 </div>
               ))}
+              <button onClick={handleAddSpecification}>Add Specification</button>
             </div>
           </div>
           <div className='form-group'>
