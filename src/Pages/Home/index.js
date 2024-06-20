@@ -12,6 +12,7 @@ const Home = () => {
     if (products.length > 0) {
       // const sellerProducts = products.filter(product => product.seller === sellerId);
       const sellerProducts = products
+      console.log(sellerProducts)
       const sortedProducts = sellerProducts.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
       const latest20Products = sortedProducts.slice(0, 20);
       setLatestProducts(latest20Products);

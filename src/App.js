@@ -26,7 +26,7 @@ function App() {
       setIsLoading(false);
       return;
     }
-    console.log(user);
+    // console.log(user);
     if (!user?.token) {
       if (window.location.path !== "/signin") {
         setIsLoading(false);

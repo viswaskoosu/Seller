@@ -10,11 +10,13 @@ import { useStateValue } from '../../Context/StateProvider';
 
 function SellerAccountPage() {
   const [{ user }, dispatch] = useStateValue();
+  const [state,] = useStateValue()
   const [image, setImage] = useState(""); 
   const navigate = useNavigate();
 
   const logout = () => {
     localStorage.removeItem("user");
+    console.log(state)
     dispatch({
       type: "USER_LOGOUT",
     });

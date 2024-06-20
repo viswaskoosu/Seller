@@ -12,7 +12,8 @@ export const actionTypes = {
   DELETE_PRODUCT: 'DELETE_PRODUCT',
   ADD_TO_SELLING_HISTORY: 'ADD_TO_SELLING_HISTORY',
   SET_PRODUCTS: 'SET_PRODUCTS',
-  USER_LOGIN: 'USER_LOGIN'
+  USER_LOGIN: 'USER_LOGIN',
+  USER_LOGOUT: 'USER_LOGOUT',
 };
 
 const reducer = (state, action) => {
@@ -48,6 +49,11 @@ const reducer = (state, action) => {
       return {
         ...state,
         userLoggedIn: true,
+      }
+    case actionTypes.USER_LOGOUT:
+      return {
+        ...state,
+        userLoggedIn: false,
       }
     default:
       return state;
