@@ -75,7 +75,7 @@ const SellerProduct = ({ id, onUpdate }) => {
           <Stack spacing={1}>
             <Rating name={`rating-${id}`} value={product.rating} precision={0.5} readOnly />
           </Stack>
-          <p className="rating-text">({product.rating}) Rated by {product.reviews.length} users</p>
+          <p className="rating-text">({product.rating}) Rated by {product.reviews?.length} users</p>
         </div>
         <p>Current Quantity: {quantity}</p>
         <div>

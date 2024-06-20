@@ -10,6 +10,7 @@ ReactDOM.render(
         user: null,
         products: [], 
         sellingHistory: [],
+        userLoggedIn: false
     }} reducer={reducer}>
       <App />
       </StateProvider>

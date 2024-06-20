@@ -2,7 +2,8 @@ export const initialState = {
   user: null,
   products: [],
   sellingHistory: [],
-  sellingHistory:[],
+  userLoggedIn: false
+  // sellingHistory:[],
 };
 
 export const actionTypes = {
@@ -11,6 +12,7 @@ export const actionTypes = {
   DELETE_PRODUCT: 'DELETE_PRODUCT',
   ADD_TO_SELLING_HISTORY: 'ADD_TO_SELLING_HISTORY',
   SET_PRODUCTS: 'SET_PRODUCTS',
+  USER_LOGIN: 'USER_LOGIN'
 };
 
 const reducer = (state, action) => {
@@ -42,6 +44,11 @@ const reducer = (state, action) => {
         ...state,
         sellingHistory: [...state.sellingHistory, action.sale],
       };
+    case actionTypes.USER_LOGIN:
+      return {
+        ...state,
+        userLoggedIn: true,
+      }
     default:
       return state;
   }
