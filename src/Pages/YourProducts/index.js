@@ -12,10 +12,11 @@ const YourProducts = () => {
   const [sortBy, setSortBy] = useState('');
   const navigate = useNavigate()
   useEffect(() => {
-    const sellerProducts = products.filter(product => product.seller === sellerId);
+    // const sellerProducts = products.filter(product => product.seller === sellerId);
+    const sellerProducts = products
     setFilteredProducts(sellerProducts);
   }, [products, sellerId]);
-console.log(sellerId)
+// console.log(sellerId)
 console.log(products)
   const handleSortChange = (sortType) => {
     setSortBy(sortType);
