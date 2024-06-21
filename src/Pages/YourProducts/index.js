@@ -17,7 +17,7 @@ const YourProducts = () => {
     setFilteredProducts(sellerProducts);
   }, [products, sellerId]);
 // console.log(sellerId)
-console.log(products)
+// console.log(products)
   const handleSortChange = (sortType) => {
     setSortBy(sortType);
     switch (sortType) {

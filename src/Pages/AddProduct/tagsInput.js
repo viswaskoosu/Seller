@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Chip, Box } from '@mui/material';
 
-const TagsInput = ({ newTag, setNewTag }) => {
+const TagsInput = ({ newTag, setNewTag, handleInputChange, name, displayName }) => {
   const [inputValue, setInputValue] = useState('');
 
   const handleInputChangeLocal = (event) => {
@@ -12,6 +12,7 @@ const TagsInput = ({ newTag, setNewTag }) => {
     if (event.key === 'Enter' && inputValue.trim() !== '') {
       setNewTag((prev) => [...prev, inputValue.trim()]);
       setInputValue('');
+      handleInputChange({target: {value: [...newTag, inputValue.trim()], name: name}})
       event.preventDefault();
     }
   };
@@ -22,7 +23,7 @@ const TagsInput = ({ newTag, setNewTag }) => {
 
   return (
     <div className="form-group">
-      <label>Tags:</label>
+      <label>{`${displayName}`}:</label>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 1 }}>
         {newTag.map((tag, index) => (
           <Chip
@@ -41,7 +42,7 @@ const TagsInput = ({ newTag, setNewTag }) => {
         rows={Math.max(newTag.length, 1)}
         style={{ resize: 'vertical' }}
         className="resize-textarea"
-        placeholder="Press Enter to add tag"
+        placeholder={`Press Enter to add ${displayName}`}
       />
     </div>
   );

@@ -5,8 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import Categories from "../../Categories";
 import './AddProduct.css'; // Import CSS file for consistent styling
 import TagsInput from "./tagsInput";
+import {postReq, displayError} from '../../Requests'
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import LoadingPage from "../LoadingPage";
+import Loading from "react-loading";
 const AddProduct = () => {
   const [, dispatch] = useStateValue();
+  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate();
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -21,7 +27,7 @@ const AddProduct = () => {
     specifications: [],
     images: [],
   });
-
+  console.log(newProduct)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewProduct((prev) => ({
@@ -58,22 +64,32 @@ const AddProduct = () => {
     const specificationsObject = newProduct.specifications.reduce((acc, { key, value }) => {
       acc[key] = value;
       return acc;
-    }, {});
+    }, {})
 
     const category = newProduct.category === 'Other' ? newProduct.customCategory : newProduct.category;
     console.log( { ...newProduct, category, specifications: specificationsObject, dateAdded: new Date().toISOString() })
-    dispatch({
-      type: actionTypes.ADD_PRODUCT,
-      product: { ...newProduct, category, specifications: specificationsObject, dateAdded: new Date().toISOString() },
-    });
+    const modifiedProduct = { ...newProduct, price: Number(newProduct.price), mrp: Number(newProduct.mrp), available: Number(newProduct.available), category, specifications: specificationsObject, dateAdded: new Date().toISOString() }
+    postReq(setIsLoading, '/product/editproduct?request=ADD', modifiedProduct)
+    .then(() => {
+      dispatch({
+        type: actionTypes.ADD_PRODUCT,
+        product: modifiedProduct ,
+      });
     navigate('/your-products');
+    })
+    .catch((e) => {
+      displayError(e)
+    })
+      
   };
 
   const handleCancel = () => {
     navigate('/your-products');
   };
   const [tags, setTags] = useState([]);
-  return (
+  const [keyFeatures, setKeyFeatures] = useState([]);
+  const [images, setImages] = useState([]);
+  return (isLoading? <LoadingPage/>:
     <div className="product-detail">
       <div className="product-detail-header">
         <h2>Add Product</h2>
@@ -169,8 +185,9 @@ const AddProduct = () => {
             className="resize-textarea"
           />
         </div> */}
-        <TagsInput newTag={tags} setNewTag={setTags} />
-        <div className="form-group">
+        <TagsInput newTag={tags} setNewTag={setTags} handleInputChange={handleInputChange} name='tags' displayName='Tags' />
+        <TagsInput newTag={keyFeatures} setNewTag={setKeyFeatures} handleInputChange={handleInputChange} name='keyFeatures' displayName='Key Features' />
+        {/* <div className="form-group">
           <label>Key Features:</label>
           <textarea
             name="keyFeatures"
@@ -187,7 +204,7 @@ const AddProduct = () => {
             style={{ resize: 'vertical' }}
             className="resize-textarea"
           />
-        </div>
+        </div> */}
         <div className="form-group">
           <label>Specifications:</label>
           <div className="specifications">
@@ -217,7 +234,7 @@ const AddProduct = () => {
             <button onClick={handleAddSpecification}>Add Specification</button>
           </div>
         </div>
-        <div className="form-group">
+        {/* <div className="form-group">
           <label>Images:</label>
           <textarea
             name="images"
@@ -234,7 +251,8 @@ const AddProduct = () => {
             style={{ resize: 'vertical' }}
             className="resize-textarea"
           />
-        </div>
+        </div> */}
+        <TagsInput newTag={images} setNewTag={setImages} handleInputChange={handleInputChange} name='images' displayName='Images' />
         <button className="save-button" onClick={handleSave}>Save</button>
         <button className="cancel-button" onClick={handleCancel}>Cancel</button>
       </div>

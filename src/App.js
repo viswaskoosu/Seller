@@ -18,6 +18,7 @@ import ProductDetailInfo from "./Pages/ProductDetailInfo";
 import SignIn from "./Pages/SignIn";
 import {ToastContainer} from 'react-toastify'
 import Statistics from "./Pages/Statistics";
+import {getReq} from './Requests'
 function App() {
   const [{ user }, dispatch] = useStateValue();
   const [isLoading, setIsLoading] = useState(true);
@@ -35,24 +36,38 @@ function App() {
       }
       return;
     }
-    setIsLoading(true);
-    axios
-      .get(
-        `${process.env.REACT_APP_API_URL}/product/fetchproducts?seller=${user.token}`
-      )
-      .then((response) => {
-        dispatch({
-          type: "SET_PRODUCTS",
-          products: response.data,
-        });
-      })
-      .catch(() => {
-        setIsLoading(false);
-        window.location.replace("/error");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    // setIsLoading(true);
+    // axios
+    //   .get(
+    //     `${process.env.REACT_APP_API_URL}/product/fetchproducts?seller=${user.token}`
+    //   )
+    //   .then((response) => {
+    //     dispatch({
+    //       type: "SET_PRODUCTS",
+    //       products: response.data,
+    //     });
+    //   })
+    //   .catch(() => {
+    //     setIsLoading(false);
+    //     window.location.replace("/error");
+    //   })
+    //   .finally(() => {
+    //     setIsLoading(false);
+    //   });
+    getReq(setIsLoading, `/product/fetchproducts`)
+    .then((products) => {
+      dispatch({
+              type: "SET_PRODUCTS",
+              products: products,
+            });
+    })
+    .catch(() => {
+      setIsLoading(false);
+      window.location.replace("/error");
+    })
+    .finally(() => {
+      setIsLoading(false);
+    })
   }, [dispatch]);
 
   return isLoading ? (
