@@ -10,14 +10,13 @@ const SellerProduct = ({ id, onUpdate }) => {
   const [{ products }, dispatch] = useStateValue();
   const product = products.find(prod => prod.id === id);
   const [isLoading, setIsLoading] = useState(false)
-  const [quantity, setQuantity] = useState(0);
+  // const [quantity, setQuantity] = useState(0);
   const [feedback, setFeedback] = useState('');
-
-  useEffect(() => {
-    if (product) {
-      setQuantity(product.available);
-    }
-  }, [product]);
+  // useEffect(() => {
+  //   if (product) {
+  //     setQuantity(product.available);
+  //   }
+  // }, [product]);
 
   if (!product) {
     return <div>Product not found</div>;
@@ -40,12 +39,35 @@ const SellerProduct = ({ id, onUpdate }) => {
   };
 
   const increaseQuantity = () => {
-    setQuantity(quantity + 1);
+    postReq(setIsLoading, `/product/editproduct?request=QUANTITY&quantity=${product.available+1}&id=${id}`)
+    .then(() => {
+      dispatch({
+        type: actionTypes.SET_QUANTITY,
+        id: id,
+        quantity: product.available+1
+      })
+      // setQuantity(quantity + 1);
+    })
+    .catch((e) => {
+      displayError(e)
+    })
   };
 
   const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
+    
+    if (product.available > 1) {
+      postReq(setIsLoading, `/product/editproduct?request=QUANTITY&quantity=${product.available-1}&id=${id}`)
+    .then(() => {
+      dispatch({
+        type: actionTypes.SET_QUANTITY,
+        id: id,
+        quantity: product.available-1
+      })
+      // setQuantity(quantity - 1);
+    })
+    .catch((e) => {
+      displayError(e)
+    })
     } else {
       deleteProduct();
     }
@@ -55,9 +77,9 @@ const SellerProduct = ({ id, onUpdate }) => {
     dispatch({
       type: actionTypes.UPDATE_PRODUCT_QUANTITY,
       productId: id,
-      quantity: quantity,
+      quantity: product.available,
     });
-    setFeedback(`Quantity updated successfully to ${quantity}.`);
+    setFeedback(`Quantity updated successfully to ${product.available}.`);
     if (onUpdate) onUpdate();
   };
 
@@ -85,7 +107,7 @@ const SellerProduct = ({ id, onUpdate }) => {
         </div>
         <div className='quantity'>
         <p>Current Quantity: </p>
-        <p className='value'>{quantity}</p>
+        <p className='value'>{product.available}</p>
         </div>
         <div className="button-group">
         <div className='button-smallScreen'>

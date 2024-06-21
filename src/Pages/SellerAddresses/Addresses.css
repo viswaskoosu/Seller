@@ -16,12 +16,12 @@
   background-color: #f4f4f9;
 }
 
-.addresses .header h2 {
+.addresses .header h1 {
   font-weight: 500;
-  font-size: 30px;
+  font-size: 33px;
   margin: 0;
 }
-.addresses .header h2:hover {
+.addresses .header h1:hover {
 color:#dc3545;
 }
 

@@ -156,7 +156,7 @@ function Addresses() {
       {/* <Header /> */}
       <div className="addresses">
         <div className="header">
-          <h2>Manage Your Addresses</h2>
+          <h1>Manage Your Addresses</h1>
           <button
             className="add_address"
             onClick={() => {

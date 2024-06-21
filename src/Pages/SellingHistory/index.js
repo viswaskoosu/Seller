@@ -6,15 +6,13 @@ import dummySellingHistory from '../../dummySellingHistory';
 function SellingHistory() {
   const [sellingHistory, setSellingHistory] = useState(dummySellingHistory);
   const [filteredHistory, setFilteredHistory] = useState([]);
-  const [filter, setFilter] = useState('all'); // Default filter option
-  const [customYear, setCustomYear] = useState(''); // State to hold custom year selection
-  const currentDate = new Date(); // Declare currentDate here
+  const [filter, setFilter] = useState('all');
+  const [customYear, setCustomYear] = useState('');
+  const currentDate = new Date();
 
   const handleFilterChange = (event) => {
     const value = event.target.value;
     setFilter(value);
-
-    // Reset custom year selection if a predefined filter is selected
     if (value !== 'custom') {
       setCustomYear('');
     }
@@ -23,14 +21,11 @@ function SellingHistory() {
   const handleCustomYearChange = (event) => {
     const value = event.target.value;
     setCustomYear(value);
-
-    // Update filter state to 'custom' when a custom year is selected
     setFilter('custom');
   };
 
   const filterAndSortHistory = () => {
-    const currentDate = new Date(); // Declare currentDate here
-
+    const currentDate = new Date();
     let fromDate;
 
     switch (filter) {
@@ -58,12 +53,9 @@ function SellingHistory() {
         fromDate = new Date(currentDate.getFullYear() - 5, currentDate.getMonth(), currentDate.getDate());
         break;
       case 'custom':
-        if (!customYear) return sellingHistory; // Return original list if custom year is not selected
-
-        // Calculate fromDate based on custom year
-        fromDate = new Date(customYear, 0, 1); // January 1st of the selected custom year
-        const toDate = new Date(customYear, 11, 31, 23, 59, 59); // December 31st of the selected custom year
-
+        if (!customYear) return sellingHistory;
+        fromDate = new Date(customYear, 0, 1);
+        const toDate = new Date(customYear, 11, 31, 23, 59, 59);
         return sellingHistory
           .flatMap(item =>
             item.soldDate.map(date => ({
@@ -75,10 +67,9 @@ function SellingHistory() {
           .sort((a, b) => b.soldDate - a.soldDate);
 
       default:
-        return sellingHistory; // Return original list if filter is invalid
+        return sellingHistory;
     }
 
-    // Filter based on fromDate and sort by SoldDate in descending order
     return sellingHistory
       .flatMap(item =>
         item.soldDate.map(date => ({
@@ -93,7 +84,7 @@ function SellingHistory() {
   useEffect(() => {
     const filteredData = filterAndSortHistory();
     setFilteredHistory(filteredData);
-  }, [filter, customYear, sellingHistory]); // Update when filter, customYear, or sellingHistory changes
+  }, [filter, customYear, sellingHistory]);
 
   const formatDate = (timestamp) => {
     const dateObject = new Date(timestamp);
@@ -101,14 +92,14 @@ function SellingHistory() {
   };
 
   const renderOrderStatus = (status) => {
-    return status === 1 ? 'Delivered' : 'Shipped';
+    if(status===1) return 'Delivered';
+    else if(status === 0 ) return 'Shipped';
+    else if(status === -1) return 'Have to Ship'
   };
 
   return (
     <div className="selling-history-container">
       <h1 className="selling-history-title">Selling History</h1>
-
-      {/* Filter dropdown */}
       <div className="selling-history-filter">
         <label htmlFor="filter">Filter by:</label>
         <select id="filter" value={filter} onChange={handleFilterChange}>
@@ -120,8 +111,6 @@ function SellingHistory() {
           <option value="5years">Last 5 years</option>
           <option value="custom">Custom Year</option>
         </select>
-
-        {/* Custom Year selection */}
         {filter === 'custom' && (
           <select id="customYear" value={customYear} onChange={handleCustomYearChange}>
             <option value="">Select Year</option>
@@ -131,8 +120,6 @@ function SellingHistory() {
           </select>
         )}
       </div>
-
-      {/* Selling history table */}
       <table className="selling-history-table">
         <thead>
           <tr>

@@ -16,11 +16,22 @@ const dummySellingHistory = [
       name: 'Koosu Viswas'
     },
     paymentMethod: 'Credit Card',
-    orderStatus: 1,
-    soldDate: [
-      new Date('2022-05-15').getTime(),
-      new Date('2024-05-15').getTime()
-    ],
+    orders: [
+      {
+        transactionId: '',
+        orderStatus: 1,
+        soldDate:new Date('2022-05-15').getTime(),
+      },      
+      {
+        transactionId: '',
+        orderStatus: 1,
+        soldDate:new Date('2024-05-15').getTime()
+      },
+      {
+        transactionId: '',
+        orderStatus: 1,
+        soldDate:new Date('2024-05-16').getTime()
+      },]
   },
   {
     transactionId: 'xyz789',
