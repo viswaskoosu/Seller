@@ -15,7 +15,7 @@ const YourProducts = () => {
     // const sellerProducts = products.filter(product => product.seller === sellerId);
     const sellerProducts = products
     setFilteredProducts(sellerProducts);
-  }, [products, sellerId]);
+  }, [products]);
 // console.log(sellerId)
 // console.log(products)
   const handleSortChange = (sortType) => {
@@ -68,8 +68,8 @@ const YourProducts = () => {
   };
 
   const handleUpdate = () => {
-    const sellerProducts = products.filter(product => product.seller === sellerId);
-    setFilteredProducts(sellerProducts);
+    // const sellerProducts = products.filter(product => product.seller === sellerId);
+    // setFilteredProducts(sellerProducts);
   };
   const handleAddProduct = () => {
     navigate('/addproduct')

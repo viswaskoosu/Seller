@@ -14,6 +14,7 @@ export const actionTypes = {
   SET_PRODUCTS: 'SET_PRODUCTS',
   USER_LOGIN: 'USER_LOGIN',
   USER_LOGOUT: 'USER_LOGOUT',
+  SET_QUANTITY: 'SET_QUANTITY',
 };
 
 const reducer = (state, action) => {
@@ -34,6 +35,16 @@ const reducer = (state, action) => {
         ...state,
         products: [...state.products, action.product],
       };
+    case actionTypes.SET_QUANTITY:
+      const newProducts = state.products.map((product) =>
+        product.id === action.id
+          ? { ...product, available: action.quantity }
+          : product
+      );
+      return{
+        ...state,
+        products: newProducts
+      }
     case actionTypes.DELETE_PRODUCT:
       const updatedProducts = state.products.filter(product => product.id !== action.productId);
       return {
