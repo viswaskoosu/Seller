@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import dummySellingHistory from '../../dummySellingHistory'; // Adjust the path as per your file structure
-import { Bar } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 
 function Statistics() {
   const [filter, setFilter] = useState('all'); // Default filter is 'all'
@@ -122,6 +122,140 @@ function Statistics() {
     ],
   };
 
+  // Prepare data for year-wise sales amount (if applicable)
+  const yearWiseSalesChartData = () => {
+    if (filter === '1year' || filter === '2years' || filter === '5years' || filter === '10years') {
+      const yearsCount = parseInt(filter.replace('years', ''), 10);
+      const currentYear = new Date().getFullYear();
+      const labels = Array.from({ length: yearsCount }, (_, index) => currentYear - yearsCount + 1 + index);
+
+      const datasets = productSales.map(product => {
+        const data = Array.from({ length: yearsCount }, (_, index) => {
+          const filteredItems = filteredSalesData.find(item => item.product.title === product.productTitle);
+          if (filteredItems) {
+            return filteredItems.transactions
+              .filter(transaction => {
+                const transactionYear = new Date(transaction.soldDate).getFullYear();
+                return transactionYear === currentYear - yearsCount + 1 + index;
+              })
+              .reduce((total, transaction) => total + transaction.amount, 0)
+              .toFixed(2);
+          }
+          return 0;
+        });
+
+        return {
+          label: product.productTitle,
+          backgroundColor: getRandomColor(),
+          borderColor: getRandomColor(),
+          borderWidth: 1,
+          hoverBackgroundColor: getRandomColor(),
+          hoverBorderColor: getRandomColor(),
+          data,
+        };
+      });
+
+      return {
+        labels: labels.map(year => `${year}`),
+        datasets,
+      };
+    }
+    return null;
+  };
+
+  // Random color generator (for chart colors)
+  const getRandomColor = () => {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    return `rgba(${r},${g},${b},0.2)`;
+  };
+
+  // Render charts based on filter
+  const renderCharts = () => {
+    switch (filter) {
+      case '1year':
+      case '2years':
+      case '5years':
+      case '10years':
+        return (
+          <div className="chart">
+            <h3>Year-wise Total Sales Amount</h3>
+            <Bar
+              data={yearWiseSalesChartData()}
+              options={{
+                maintainAspectRatio: true,
+                responsive: true,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              }}
+            />
+          </div>
+        );
+      case 'custom':
+        return (
+          <div className="chart">
+            <h3>Month-wise Total Sales Amount in {customYear}</h3>
+            <Line
+              data={monthWiseSalesChartData()}
+              options={{
+                maintainAspectRatio: true,
+                responsive: true,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              }}
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  // Prepare data for month-wise sales amount (if custom year is selected)
+  const monthWiseSalesChartData = () => {
+    if (filter === 'custom') {
+      const year = parseInt(customYear, 10);
+      const labels = Array.from({ length: 12 }, (_, index) => new Date(year, index, 1).toLocaleString('default', { month: 'short' }));
+
+      const datasets = productSales.map(product => {
+        const data = labels.map((month, index) => {
+          const filteredItems = filteredSalesData.find(item => item.product.title === product.productTitle);
+          if (filteredItems) {
+            return filteredItems.transactions
+              .filter(transaction => {
+                const transactionDate = new Date(transaction.soldDate);
+                return transactionDate.getFullYear() === year && transactionDate.getMonth() === index;
+              })
+              .reduce((total, transaction) => total + transaction.amount, 0)
+              .toFixed(2);
+          }
+          return 0;
+        });
+
+        return {
+          label: product.productTitle,
+          data,
+          fill: false,
+          borderColor: getRandomColor(),
+          tension: 0.1,
+        };
+      });
+
+      return {
+        labels,
+        datasets,
+      };
+    }
+    return null;
+  };
+
   // Find most and least sold products
   const mostSoldProduct = productSales.reduce((max, product) => (product.totalTransactions > max.totalTransactions ? product : max), { totalTransactions: -Infinity });
   const leastSoldProduct = productSales.reduce((min, product) => (product.totalTransactions < min.totalTransactions ? product : min), { totalTransactions: Infinity });
@@ -185,6 +319,7 @@ function Statistics() {
             }}
           />
         </div>
+        {renderCharts()}
       </div>
       <h3>Most and Least Sold Products</h3>
       <p>Most times sold: {mostSoldProduct.totalTransactions} units ({mostSoldProduct.productTitle})</p>
