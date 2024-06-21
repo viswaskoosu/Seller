@@ -8,7 +8,12 @@ import './ProductDetail.css'; // Import CSS file
 import Carousel from '../../components/Carousel'; // Import Carousel component
 import ProductDetailInfo from '../ProductDetailInfo';
 import TagsInput from '../../components/TagsInput'
+import {postReq, displayError} from '../../Requests'
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import LoadingPage from "../LoadingPage";
 const ProductDetail = () => {
+  const [isLoading, setIsLoading] = useState(false)
   const { productId } = useParams();
   const [{ products }, dispatch] = useStateValue();
   const product = products.find((prod) => prod.id === productId);
@@ -71,10 +76,17 @@ const ProductDetail = () => {
       acc[key] = value;
       return acc;
     }, {});
-    dispatch({
-      type: actionTypes.UPDATE_PRODUCT,
-      product: { ...updatedProduct, specifications: specificationsObject },
-    });
+    const modifiedProduct = { ...updatedProduct, specifications: specificationsObject }
+    postReq(setIsLoading, '/product/editproduct?request=UPDATE', modifiedProduct)
+    .then(() => {
+      dispatch({
+        type: actionTypes.UPDATE_PRODUCT,
+        product: modifiedProduct,
+      });
+    })
+    .catch((e) => {
+      displayError(e)
+    })
     setIsEditing(false);
   };
 
@@ -88,7 +100,7 @@ const ProductDetail = () => {
     setIsEditing(false);
   };
 
-  return (
+  return (isLoading? <LoadingPage/>:
     <div className='product-detail'>
       <div className='product-detail-header'>
         <h2>Product Detail</h2>

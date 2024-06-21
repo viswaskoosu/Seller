@@ -10,6 +10,11 @@ const TagsInput = ({ newTag, setNewTag, handleInputChange, name, displayName }) 
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && inputValue.trim() !== '') {
+      if (newTag.some(tag => tag===inputValue.trim())){
+        setInputValue('');
+        event.preventDefault();
+        return
+      }
       setNewTag((prev) => [...prev, inputValue.trim()]);
       setInputValue('');
       handleInputChange({target: {value: [...newTag, inputValue.trim()], name: name}})
@@ -18,7 +23,9 @@ const TagsInput = ({ newTag, setNewTag, handleInputChange, name, displayName }) 
   };
 
   const handleDelete = (tagToDelete) => () => {
-    setNewTag((prev) => prev.filter((tag) => tag !== tagToDelete));
+    const updatedTags = newTag.filter((tag) => tag !== tagToDelete)
+    setNewTag(updatedTags);
+    handleInputChange({target: {value: updatedTags, name: name}})
   };
 
   return (

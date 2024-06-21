@@ -9,7 +9,6 @@ import {postReq, displayError} from '../../Requests'
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingPage from "../LoadingPage";
-import Loading from "react-loading";
 const AddProduct = () => {
   const [, dispatch] = useStateValue();
   const [isLoading, setIsLoading] = useState(false)
