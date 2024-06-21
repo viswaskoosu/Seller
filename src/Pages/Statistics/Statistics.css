@@ -72,4 +72,13 @@ a{
   .statistics-chart {
     margin-top: 20px;
   }
+  .charts-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .chart {
+    width: 45%; /* Adjust as needed */
+    margin-bottom: 20px;
+  }
   

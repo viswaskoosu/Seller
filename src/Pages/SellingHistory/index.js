@@ -25,60 +25,56 @@ function SellingHistory() {
   };
 
   const filterAndSortHistory = () => {
-    const currentDate = new Date();
     let fromDate;
 
     switch (filter) {
       case 'all':
-        return sellingHistory.flatMap(item =>
-          item.soldDate.map(date => ({
-            ...item,
-            soldDate: date
-          }))
-        ).sort((a, b) => b.soldDate - a.soldDate);
+        return sellingHistory.slice().sort((a, b) => {
+          const lastSoldDateA = a.transactions[0].soldDate;
+          const lastSoldDateB = b.transactions[0].soldDate;
+          return lastSoldDateB - lastSoldDateA;
+        });
 
       case '3months':
-        fromDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 3, currentDate.getDate());
+        fromDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 3, 1);
         break;
       case '6months':
-        fromDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 6, currentDate.getDate());
+        fromDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 6, 1);
         break;
       case '1year':
-        fromDate = new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), currentDate.getDate());
+        fromDate = new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), 1);
         break;
       case '2years':
-        fromDate = new Date(currentDate.getFullYear() - 2, currentDate.getMonth(), currentDate.getDate());
+        fromDate = new Date(currentDate.getFullYear() - 2, currentDate.getMonth(), 1);
         break;
       case '5years':
-        fromDate = new Date(currentDate.getFullYear() - 5, currentDate.getMonth(), currentDate.getDate());
+        fromDate = new Date(currentDate.getFullYear() - 5, currentDate.getMonth(), 1);
         break;
       case 'custom':
         if (!customYear) return sellingHistory;
         fromDate = new Date(customYear, 0, 1);
         const toDate = new Date(customYear, 11, 31, 23, 59, 59);
-        return sellingHistory
-          .flatMap(item =>
-            item.soldDate.map(date => ({
-              ...item,
-              soldDate: date
-            }))
-          )
-          .filter(item => item.soldDate >= fromDate.getTime() && item.soldDate <= toDate.getTime())
-          .sort((a, b) => b.soldDate - a.soldDate);
+        return sellingHistory.filter(product => {
+          const lastTransactionDate = product.transactions[0].soldDate;
+          return lastTransactionDate >= fromDate && lastTransactionDate <= toDate;
+        }).sort((a, b) => {
+          const lastSoldDateA = a.transactions[0].soldDate;
+          const lastSoldDateB = b.transactions[0].soldDate;
+          return lastSoldDateB - lastSoldDateA;
+        });
 
       default:
         return sellingHistory;
     }
 
-    return sellingHistory
-      .flatMap(item =>
-        item.soldDate.map(date => ({
-          ...item,
-          soldDate: date
-        }))
-      )
-      .filter(item => item.soldDate >= fromDate.getTime())
-      .sort((a, b) => b.soldDate - a.soldDate);
+    return sellingHistory.filter(product => {
+      const lastTransactionDate = product.transactions[0].soldDate;
+      return lastTransactionDate >= fromDate;
+    }).sort((a, b) => {
+      const lastSoldDateA = a.transactions[0].soldDate;
+      const lastSoldDateB = b.transactions[0].soldDate;
+      return lastSoldDateB - lastSoldDateA;
+    });
   };
 
   useEffect(() => {
@@ -92,9 +88,48 @@ function SellingHistory() {
   };
 
   const renderOrderStatus = (status) => {
-    if(status===1) return 'Delivered';
-    else if(status === 0 ) return 'Shipped';
-    else if(status === -1) return 'Have to Ship'
+    switch (status) {
+      case 1:
+        return 'Delivered';
+      case 0:
+        return 'Shipped';
+      case -1:
+        return 'Not yet shipped';
+      default:
+        return 'Unknown';
+    }
+  };
+
+  const renderTransactions = (product) => {
+    if (!product.transactions || product.transactions.length === 0) {
+      return (
+        <tr key={product.product.id}>
+          <td colSpan="9">No transactions available</td>
+        </tr>
+      );
+    }
+
+    return product.transactions.map((transaction, index) => (
+      <tr key={transaction.transactionId}>
+        {index === 0 ? (
+          <>
+            <td rowSpan={product.transactions.length}>
+              <Link to={`/product/${product.product.id}`}>{product.product.title}</Link>
+            </td>
+            <td rowSpan={product.transactions.length}>
+              {product.product.price ? `₹${product.product.price.toFixed(2)}` : 'Price N/A'}
+            </td>
+          </>
+        ) : null}
+        <td>{transaction.quantity}</td>
+        <td>{transaction.amount.toFixed(2)}</td>
+        <td>{transaction.buyer.name}</td>
+        <td>{transaction.transactionId}</td>
+        <td>{formatDate(transaction.soldDate)}</td>
+        <td>{transaction.paymentMethod}</td>
+        <td>{renderOrderStatus(transaction.orderStatus)}</td>
+      </tr>
+    ));
   };
 
   return (
@@ -135,21 +170,13 @@ function SellingHistory() {
           </tr>
         </thead>
         <tbody>
-          {filteredHistory.map((item, index) => (
-            <tr key={index}>
-              <td>
-                <Link to={`/product/${item.product.id}`}>{item.product.title}</Link>
-              </td>
-              <td>₹{item.price.toFixed(2)}</td>
-              <td>{item.quantitySold}</td>
-              <td>₹{(item.price * item.quantitySold).toFixed(2)}</td>
-              <td>{item.buyer.name}</td>
-              <td>{item.transactionId}</td>
-              <td>{formatDate(item.soldDate)}</td>
-              <td>{item.paymentMethod}</td>
-              <td>{renderOrderStatus(item.orderStatus)}</td>
+          {filteredHistory.length > 0 ? (
+            filteredHistory.map((product) => renderTransactions(product))
+          ) : (
+            <tr>
+              <td colSpan="9">No data available</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>

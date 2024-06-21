@@ -1,239 +1,136 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ResponsiveContainer } from 'recharts';
-import dummySellingHistory from '../../dummySellingHistory';
-import { Link } from 'react-router-dom';
+import dummySellingHistory from '../../dummySellingHistory'; // Adjust the path as per your file structure
+import { Bar } from 'react-chartjs-2';
 
 function Statistics() {
-  const [sellingHistory, setSellingHistory] = useState([]);
-  const [filter, setFilter] = useState('custom'); // Default filter to 'custom'
-  const [customYear, setCustomYear] = useState(new Date().getFullYear()); // Default custom year to current year
-  let startYear = new Date().getFullYear();
+  const [filter, setFilter] = useState('all'); // Default filter is 'all'
+  const [customYear, setCustomYear] = useState(new Date().getFullYear().toString()); // Default custom year is current year
+  const [filteredSalesData, setFilteredSalesData] = useState([]);
 
+  // Handle filter change
+  const handleFilterChange = (e) => {
+    const selectedFilter = e.target.value;
+    setFilter(selectedFilter);
+    if (selectedFilter !== 'custom') {
+      setCustomYear(new Date().getFullYear().toString()); // Reset custom year input when filter changes
+    }
+  };
+
+  // Handle custom year input change
+  const handleCustomYearChange = (e) => {
+    const inputYear = e.target.value.trim();
+    if (/^\d{4}$/.test(inputYear) && parseInt(inputYear, 10) <= new Date().getFullYear()) {
+      setCustomYear(inputYear);
+    } else {
+      setCustomYear(''); // Optionally handle invalid input state
+    }
+  };
+
+  // Effect to update filtered data when filter or customYear changes
   useEffect(() => {
-    const fetchData = async () => {
-      setSellingHistory(dummySellingHistory);
-    };
-    fetchData();
-  }, []);
+    const currentDate = new Date();
 
-  const handleFilterChange = (event) => {
-    setFilter(event.target.value);
-  };
-
-  const handleCustomYearChange = (event) => {
-    setCustomYear(parseInt(event.target.value));
-  };
-
-  const filterSalesData = () => {
-    const filteredHistory = sellingHistory.filter(sale => {
-      return sale.soldDate.some(date => {
-        const saleDate = new Date(date);
-        const saleYear = saleDate.getFullYear();
-
-        switch (filter) {
-          case '1year':
-            return saleYear === new Date().getFullYear();
-          case '2years':
-            return saleYear >= new Date().getFullYear() - 1 && saleYear <= new Date().getFullYear();
-          case '5years':
-            return saleYear >= new Date().getFullYear() - 4 && saleYear <= new Date().getFullYear();
-          case '10years':
-            return saleYear >= new Date().getFullYear() - 9 && saleYear <= new Date().getFullYear();
-          case 'custom':
-            return saleYear === customYear;
-          default:
-            return true;
-        }
-      });
-    });
-    return filteredHistory;
-  };
-
-  const calculateTotalSales = (data) => {
-    return data.reduce((total, sale) => total + sale.price * sale.quantitySold, 0);
-  };
-
-  const getProductWiseSales = (data) => {
-    const productSales = {};
-    data.forEach(sale => {
-      if (productSales[sale.product.title]) {
-        productSales[sale.product.title] += sale.price * sale.quantitySold;
-      } else {
-        productSales[sale.product.title] = sale.price * sale.quantitySold;
-      }
-    });
-    return productSales;
-  };
-
-  const getSalesStats = (data) => {
-    const stats = {
-      mostTimesSold: null,
-      leastTimesSold: null,
-      mostAmountSold: null,
-      leastAmountSold: null,
-    };
-
-    const productSalesCount = {};
-    const productSalesAmount = {};
-
-    data.forEach(sale => {
-      const { title } = sale.product;
-      const saleAmount = sale.price * sale.quantitySold;
-
-      productSalesCount[title] = (productSalesCount[title] || 0) + sale.quantitySold;
-      productSalesAmount[title] = (productSalesAmount[title] || 0) + saleAmount;
-    });
-
-    const products = Object.keys(productSalesCount);
-
-    if (products.length > 0) {
-      stats.mostTimesSold = products.reduce((a, b) => productSalesCount[a] > productSalesCount[b] ? a : b);
-      stats.leastTimesSold = products.reduce((a, b) => productSalesCount[a] < productSalesCount[b] ? a : b);
-      stats.mostAmountSold = products.reduce((a, b) => productSalesAmount[a] > productSalesAmount[b] ? a : b);
-      stats.leastAmountSold = products.reduce((a, b) => productSalesAmount[a] < productSalesAmount[b] ? a : b);
-    }
-
-    return stats;
-  };
-
-  const getMonthlySales = (data) => {
-    const monthlySales = {};
-
-    // Initialize monthly sales for all months of the selected custom year
-    if (filter === 'custom') {
-      const selectedYear = customYear;
-      for (let month = 1; month <= 12; month++) {
-        monthlySales[`${selectedYear}-${month}`] = 0;
-      }
-    } else {
-      // Initialize monthly sales for all months within the selected filter range
-      for (let year = new Date().getFullYear() - parseInt(filter.replace('years', '')) + 1; year <= new Date().getFullYear(); year++) {
-        for (let month = (year === new Date().getFullYear() - parseInt(filter.replace('years', '')) + 1 ? new Date().getMonth() + 1 : 1); month <= 12; month++) {
-          monthlySales[`${year}-${month}`] = 0;
-        }
-      }
-    }
-
-    data.forEach(sale => {
-      sale.soldDate.forEach(date => {
-        const saleDate = new Date(date);
-        const year = saleDate.getFullYear();
-        const month = saleDate.getMonth() + 1; // Month is zero-indexed
-
-        // Check if the sale is within the selected range
-        if (
-          (filter === 'custom' && year === customYear) ||
-          (filter !== 'custom' && year >= new Date().getFullYear() - parseInt(filter.replace('years', '')) + 1 && year <= new Date().getFullYear())
-        ) {
-          const monthYear = `${year}-${month}`;
-          monthlySales[monthYear] += sale.price * sale.quantitySold;
-        }
-      });
-    });
-
-    return monthlySales;
-  };
-
-  const getYearlySales = (data) => {
-    const yearlySales = {};
-
-    // Initialize yearly sales for all years within the selected filter range
-    for (let year = new Date().getFullYear() - parseInt(filter.replace('years', '')) + 1; year <= new Date().getFullYear(); year++) {
-      yearlySales[year] = 0;
-    }
-
-    data.forEach(sale => {
-      sale.soldDate.forEach(date => {
-        const saleDate = new Date(date);
-        const year = saleDate.getFullYear();
-
-        // Check if the sale is within the selected range
-        if (year >= new Date().getFullYear() - parseInt(filter.replace('years', '')) + 1 && year <= new Date().getFullYear()) {
-          yearlySales[year] += sale.price * sale.quantitySold;
-        }
-      });
-    });
-    return yearlySales;
-  };
-
-  const filteredData = filterSalesData();
-  const monthlySalesData = Object.entries(getMonthlySales(filteredData)).map(([monthYear, amount]) => ({
-    monthYear,
-    amount
-  }));
-  const yearlySalesData = Object.entries(getYearlySales(filteredData)).map(([year, amount]) => ({
-    year,
-    amount
-  }));
-
-  const salesStats = getSalesStats(filteredData);
-  const totalSales = calculateTotalSales(filteredData);
-  const monthNamesShort = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-  ];
-
-  const renderChart = () => {
-    let chartData = [];
-
-    if (filter === 'custom') {
-      chartData = Object.entries(getMonthlySales(filteredData)).map(([monthYear, amount]) => ({
-        monthYear,
-        amount
-      }));
-      startYear = customYear; // Assign customYear to startYear for custom filter
-    } else {
+    const filterSalesData = () => {
       switch (filter) {
+        case 'all':
+          return dummySellingHistory;
         case '1year':
-          startYear = new Date().getFullYear() - 1;
-          break;
+          return filterByLastNYears(1);
         case '2years':
-          startYear = new Date().getFullYear() - 1;
-          break;
+          return filterByLastNYears(2);
         case '5years':
-          startYear = new Date().getFullYear() - 4;
-          break;
+          return filterByLastNYears(5);
         case '10years':
-          startYear = new Date().getFullYear() - 9;
+          return filterByLastNYears(10);
+        case 'custom':
+          if (customYear) {
+            const year = parseInt(customYear, 10);
+            return filterByCustomYear(year);
+          }
           break;
         default:
-          startYear = new Date().getFullYear() - 1;
+          return dummySellingHistory;
       }
+    };
 
-      chartData = Object.entries(getYearlySales(filteredData)).map(([year, amount]) => ({
-        year,
-        amount
-      }));
-    }
+    const filterByLastNYears = (years) => {
+      const cutoffDate = new Date(currentDate.getFullYear() - years, 0, 1).getTime();
+      return dummySellingHistory.map(item => {
+        const filteredTransactions = item.transactions.filter(transaction => transaction.soldDate > cutoffDate);
+        return { ...item, transactions: filteredTransactions };
+      }).filter(item => item.transactions.length > 0);
+    };
 
-    return (
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey={filter === 'custom' ? "monthYear" : "year"}
-            tickFormatter={(value) => {
-              if (filter === 'custom') {
-                const [year, month] = value.split('-');
-                return `${monthNamesShort[parseInt(month) - 1]} ${year}`;
-              } else {
-                return value;
-              }
-            }}
-          />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="amount" fill="#8884d8" />
-        </BarChart>
-      </ResponsiveContainer>
-    );
+    const filterByCustomYear = (year) => {
+      const startDate = new Date(year, 0, 1).getTime();
+      const endDate = new Date(year, 11, 31, 23, 59, 59).getTime();
+      return dummySellingHistory.map(item => {
+        const filteredTransactions = item.transactions.filter(transaction => {
+          const transactionDate = new Date(transaction.soldDate).getTime();
+          return transactionDate >= startDate && transactionDate <= endDate;
+        });
+        return { ...item, transactions: filteredTransactions };
+      }).filter(item => item.transactions.length > 0);
+    };
+
+    const filteredData = filterSalesData();
+    setFilteredSalesData(filteredData);
+  }, [filter, customYear]);
+
+  // Calculate total sales
+  const totalSales = filteredSalesData.reduce((acc, item) => {
+    return acc + item.transactions.reduce((total, transaction) => total + transaction.amount, 0);
+  }, 0);
+
+  // Calculate product-wise sales
+  const productSales = filteredSalesData.map(item => {
+    const productTitle = item.product.title;
+    const productTotalSales = item.transactions.reduce((total, transaction) => total + transaction.amount, 0);
+    const totalTransactions = item.transactions.reduce((total, transaction) => total + transaction.quantity, 0); // Total quantity sold
+    return { productTitle, productTotalSales, totalTransactions };
+  });
+
+  // Prepare data for sales amount chart
+  const salesChartData = {
+    labels: productSales.map(product => product.productTitle),
+    datasets: [
+      {
+        label: 'Total Sales Amount',
+        backgroundColor: 'rgba(75,192,192,0.2)',
+        borderColor: 'rgba(75,192,192,1)',
+        borderWidth: 1,
+        hoverBackgroundColor: 'rgba(75,192,192,0.4)',
+        hoverBorderColor: 'rgba(75,192,192,1)',
+        data: productSales.map(product => product.productTotalSales.toFixed(2)),
+      },
+    ],
   };
 
-  return (
-    <div className="statistics-container">
-      <h1>Sales Dashboard</h1>
+  // Prepare data for quantity sold chart
+  const quantityChartData = {
+    labels: productSales.map(product => product.productTitle),
+    datasets: [
+      {
+        label: 'Total Quantity Sold',
+        backgroundColor: 'rgba(255,99,132,0.2)',
+        borderColor: 'rgba(255,99,132,1)',
+        borderWidth: 1,
+        hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+        hoverBorderColor: 'rgba(255,99,132,1)',
+        data: productSales.map(product => product.totalTransactions),
+      },
+    ],
+  };
 
+  // Find most and least sold products
+  const mostSoldProduct = productSales.reduce((max, product) => (product.totalTransactions > max.totalTransactions ? product : max), { totalTransactions: -Infinity });
+  const leastSoldProduct = productSales.reduce((min, product) => (product.totalTransactions < min.totalTransactions ? product : min), { totalTransactions: Infinity });
+  const mostAmountSold = productSales.reduce((max, product) => (product.productTotalSales > max.productTotalSales ? product : max), { productTotalSales: -Infinity });
+  const leastAmountSold = productSales.reduce((min, product) => (product.productTotalSales < min.productTotalSales ? product : min), { productTotalSales: Infinity });
+
+  return (
+    <div>
+      <h2>Statistics</h2>
       <div className="statistics-filter">
         <label htmlFor="filter">Filter by:</label>
         <select id="filter" value={filter} onChange={handleFilterChange}>
@@ -252,36 +149,48 @@ function Statistics() {
             placeholder="Enter year"
             min="2000"
             max={new Date().getFullYear()}
+            style={{ marginLeft: '10px', width: '100px' }}
           />
         )}
       </div>
-
-      <div className="statistics-summary">
-        <h2>Summary</h2>
-        <p>Total Sales: ₹{totalSales.toFixed(2)}</p>
-        <h3>Product-wise Sales</h3>
-        <ul>
-        {Object.entries(getProductWiseSales(filteredData)).map(([product, amount], index) => (
-            <li key={product}>
-            <Link to={`/product/${product.id}`} className='product-redirect'>
-                {index + 1}. {product}: ₹{amount.toFixed(2)}
-            </Link>
-            </li>
-        ))}
-        </ul>
-
-        <h3>Most and Least Sold Products</h3>
-        <p>Most times sold: {salesStats.mostTimesSold} ({(filteredData.filter(sale => sale.product.title === salesStats.mostTimesSold)).reduce((sum, sale) => sum + sale.quantitySold, 0)} times)</p>
-        <p>Least times sold: {salesStats.leastTimesSold} ({(filteredData.filter(sale => sale.product.title === salesStats.leastTimesSold)).reduce((sum, sale) => sum + sale.quantitySold, 0)} times)</p>
-        <p>Most amount sold: {salesStats.mostAmountSold} (₹{(filteredData.filter(sale => sale.product.title === salesStats.mostAmountSold)).reduce((sum, sale) => sum + sale.price * sale.quantitySold, 0).toFixed(2)})</p>
-        <p>Least amount sold: {salesStats.leastAmountSold} (₹{(filteredData.filter(sale => sale.product.title === salesStats.leastAmountSold)).reduce((sum, sale) => sum + sale.price * sale.quantitySold, 0).toFixed(2)})</p>
+      <p>Total Sales: ₹{totalSales.toFixed(2)}</p>
+      <div className="charts-container">
+        <div className="chart">
+          <h3>Chart: Total Sales Amount</h3>
+          <Bar
+            data={salesChartData}
+            options={{
+              maintainAspectRatio: true,
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            }}
+          />
+        </div>
+        <div className="chart">
+          <h3>Chart: Total Quantity Sold</h3>
+          <Bar
+            data={quantityChartData}
+            options={{
+              maintainAspectRatio: true,
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            }}
+          />
+        </div>
       </div>
-
-      <div className="statistics-chart">
-        <h3>{filter === '1year' || filter === 'custom' ? 'Monthly Sales Chart' : 'Yearly Sales Chart'}</h3>
-        {renderChart()}
-      </div>
-
+      <h3>Most and Least Sold Products</h3>
+      <p>Most times sold: {mostSoldProduct.totalTransactions} units ({mostSoldProduct.productTitle})</p>
+      <p>Least times sold: {leastSoldProduct.totalTransactions} units ({leastSoldProduct.productTitle})</p>
+      <p>Most amount sold: ₹{mostAmountSold.productTotalSales.toFixed(2)} ({mostAmountSold.productTitle})</p>
+      <p>Least amount sold: ₹{leastAmountSold.productTotalSales.toFixed(2)} ({leastAmountSold.productTitle})</p>
     </div>
   );
 }
