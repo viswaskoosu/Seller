@@ -1,35 +1,41 @@
 // src/Pages/ProductDetail.js
 
-import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { useStateValue } from '../../Context/StateProvider';
-import { actionTypes } from '../../reducer';
-import './ProductDetail.css'; // Import CSS file
-import Carousel from '../../components/Carousel'; // Import Carousel component
-import ProductDetailInfo from '../ProductDetailInfo';
-import TagsInput from '../../components/TagsInput'
-import {postReq, displayError} from '../../Requests'
+import React, { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+import { useStateValue } from "../../Context/StateProvider";
+import { actionTypes } from "../../reducer";
+import "./ProductDetail.css"; // Import CSS file
+import Carousel from "../../components/Carousel"; // Import Carousel component
+import ProductDetailInfo from "../ProductDetailInfo";
+import TagsInput from "../../components/TagsInput";
+import { postReq, displayError } from "../../Requests";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingPage from "../LoadingPage";
 const ProductDetail = () => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const { productId } = useParams();
   const [{ products }, dispatch] = useStateValue();
   const product = products.find((prod) => prod.id === productId);
-
+  if (!product) {
+    if (isLoading === false) setIsLoading(true);
+  } else {
+    if (isLoading === true) setIsLoading(false);
+  }
   const [isEditing, setIsEditing] = useState(false);
   const [updatedProduct, setUpdatedProduct] = useState({});
-  const [tags, setTags] = useState(product.tags);
-  const [keyFeatures, setKeyFeatures] = useState(product.keyFeatures);
-  const [images, setImages] = useState(product.images);
+  const [tags, setTags] = useState(product? product.tags: []);
+  const [keyFeatures, setKeyFeatures] = useState(product? product.keyFeatures: []);
+  const [images, setImages] = useState(product? product.images: []);
   useEffect(() => {
     if (product) {
       // Convert specifications object to an array of key-value pairs
-      const specificationsArray = Object.entries(product.specifications).map(([key, value]) => ({
-        key,
-        value,
-      }));
+      const specificationsArray = Object.entries(product.specifications).map(
+        ([key, value]) => ({
+          key,
+          value,
+        })
+      );
       setUpdatedProduct({ ...product, specifications: specificationsArray });
     }
   }, [product]);
@@ -58,12 +64,14 @@ const ProductDetail = () => {
   const handleAddSpecification = () => {
     setUpdatedProduct((prev) => ({
       ...prev,
-      specifications: [...prev.specifications, { key: '', value: '' }],
+      specifications: [...prev.specifications, { key: "", value: "" }],
     }));
   };
 
   const handleDeleteSpecification = (index) => {
-    const newSpecifications = updatedProduct.specifications.filter((_, i) => i !== index);
+    const newSpecifications = updatedProduct.specifications.filter(
+      (_, i) => i !== index
+    );
     setUpdatedProduct((prev) => ({
       ...prev,
       specifications: newSpecifications,
@@ -72,48 +80,62 @@ const ProductDetail = () => {
 
   const handleSave = () => {
     // Convert specifications array back to an object
-    const specificationsObject = updatedProduct.specifications.reduce((acc, { key, value }) => {
-      acc[key] = value;
-      return acc;
-    }, {});
-    const modifiedProduct = { ...updatedProduct, specifications: specificationsObject }
-    postReq(setIsLoading, '/product/editproduct?request=UPDATE', modifiedProduct)
-    .then(() => {
-      dispatch({
-        type: actionTypes.UPDATE_PRODUCT,
-        product: modifiedProduct,
+    const specificationsObject = updatedProduct.specifications.reduce(
+      (acc, { key, value }) => {
+        acc[key] = value;
+        return acc;
+      },
+      {}
+    );
+    const modifiedProduct = {
+      ...updatedProduct,
+      specifications: specificationsObject,
+    };
+    postReq(
+      setIsLoading,
+      "/product/editproduct?request=UPDATE",
+      modifiedProduct
+    )
+      .then(() => {
+        dispatch({
+          type: actionTypes.UPDATE_PRODUCT,
+          product: modifiedProduct,
+        });
+      })
+      .catch((e) => {
+        displayError(e);
       });
-    })
-    .catch((e) => {
-      displayError(e)
-    })
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     // Convert specifications object to an array of key-value pairs
-    const specificationsArray = Object.entries(product.specifications).map(([key, value]) => ({
-      key,
-      value,
-    }));
+    const specificationsArray = Object.entries(product.specifications).map(
+      ([key, value]) => ({
+        key,
+        value,
+      })
+    );
     setUpdatedProduct({ ...product, specifications: specificationsArray });
     setIsEditing(false);
   };
 
-  return (isLoading? <LoadingPage/>:
-    <div className='product-detail'>
-      <div className='product-detail-header'>
+  return isLoading ? (
+    <LoadingPage />
+  ) : (
+    <div className="product-detail">
+      <div className="product-detail-header">
         <h2>Product Detail</h2>
         {!isEditing && (
-          <button className='edit-button' onClick={() => setIsEditing(true)}>
+          <button className="edit-button" onClick={() => setIsEditing(true)}>
             Edit
           </button>
         )}
       </div>
 
       {isEditing ? (
-        <div className='edit-form'>
-          <div className='form-group'>
+        <div className="edit-form">
+          <div className="form-group">
             <label>Title:</label>
             <input
               type="text"
@@ -122,7 +144,7 @@ const ProductDetail = () => {
               onChange={handleInputChange}
             />
           </div>
-          <div className='form-group'>
+          <div className="form-group">
             <label>Price:</label>
             <input
               type="number"
@@ -131,7 +153,7 @@ const ProductDetail = () => {
               onChange={handleInputChange}
             />
           </div>
-          <div className='form-group'>
+          <div className="form-group">
             <label>MRP:</label>
             <input
               type="number"
@@ -140,7 +162,7 @@ const ProductDetail = () => {
               onChange={handleInputChange}
             />
           </div>
-          <div className='form-group'>
+          <div className="form-group">
             <label>Category:</label>
             <input
               type="text"
@@ -149,18 +171,18 @@ const ProductDetail = () => {
               onChange={handleInputChange}
             />
           </div>
-          <div className='form-group'>
+          <div className="form-group">
             <label>Description:</label>
             <textarea
               name="description"
               value={updatedProduct.description}
               onChange={handleInputChange}
-              className='resize-textarea'
-              rows={Math.max(updatedProduct.description.split('\n').length, 1)}
-              style={{ resize: 'vertical' }}
+              className="resize-textarea"
+              rows={Math.max(updatedProduct.description.split("\n").length, 1)}
+              style={{ resize: "vertical" }}
             />
           </div>
-          <div className='form-group'>
+          <div className="form-group">
             <label>Available:</label>
             <input
               type="number"
@@ -187,8 +209,20 @@ const ProductDetail = () => {
               className='resize-textarea'
             />
           </div> */}
-          <TagsInput newTag={tags} setNewTag={setTags} handleInputChange={handleInputChange} name='tags' displayName='Tags' />
-          <TagsInput newTag={keyFeatures} setNewTag={setKeyFeatures} handleInputChange={handleInputChange} name='keyFeatures' displayName='Key Features' />
+          <TagsInput
+            newTag={tags}
+            setNewTag={setTags}
+            handleInputChange={handleInputChange}
+            name="tags"
+            displayName="Tags"
+          />
+          <TagsInput
+            newTag={keyFeatures}
+            setNewTag={setKeyFeatures}
+            handleInputChange={handleInputChange}
+            name="keyFeatures"
+            displayName="Key Features"
+          />
           {/* <div className='form-group'>
             <label>Key Features:</label>
             <textarea
@@ -207,18 +241,22 @@ const ProductDetail = () => {
               className='resize-textarea'
             />
           </div> */}
-          <div className='form-group'>
+          <div className="form-group">
             <label>Specifications:</label>
-            <div className='specifications'>
+            <div className="specifications">
               {updatedProduct.specifications.map((spec, index) => (
-                <div key={index} className='specification'>
+                <div key={index} className="specification">
                   <input
                     type="text"
                     value={spec.key}
                     onChange={(e) =>
-                      handleSpecificationChange(index, e.target.value, spec.value)
+                      handleSpecificationChange(
+                        index,
+                        e.target.value,
+                        spec.value
+                      )
                     }
-                    className='spec-input'
+                    className="spec-input"
                   />
                   <input
                     type="text"
@@ -226,12 +264,16 @@ const ProductDetail = () => {
                     onChange={(e) =>
                       handleSpecificationChange(index, spec.key, e.target.value)
                     }
-                    className='spec-input'
+                    className="spec-input"
                   />
-                  <button onClick={() => handleDeleteSpecification(index)}>Delete</button>
+                  <button onClick={() => handleDeleteSpecification(index)}>
+                    Delete
+                  </button>
                 </div>
               ))}
-              <button onClick={handleAddSpecification}>Add Specification</button>
+              <button onClick={handleAddSpecification}>
+                Add Specification
+              </button>
             </div>
           </div>
           {/* <div className='form-group'>
@@ -252,9 +294,19 @@ const ProductDetail = () => {
               className='resize-textarea'
             />
           </div> */}
-        <TagsInput newTag={images} setNewTag={setImages} handleInputChange={handleInputChange} name='images' displayName='Images' />
-          <button className='save-button' onClick={handleSave}>Save</button>
-          <button className='cancel-button' onClick={handleCancel}>Cancel</button>
+          <TagsInput
+            newTag={images}
+            setNewTag={setImages}
+            handleInputChange={handleInputChange}
+            name="images"
+            displayName="Images"
+          />
+          <button className="save-button" onClick={handleSave}>
+            Save
+          </button>
+          <button className="cancel-button" onClick={handleCancel}>
+            Cancel
+          </button>
         </div>
       ) : (
         <Link to={`/product-preview/${product.id}`}>View Product Details</Link>

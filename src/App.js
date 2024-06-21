@@ -61,8 +61,9 @@ function App() {
               products: products,
             });
     })
-    .catch(() => {
+    .catch((e) => {
       setIsLoading(false);
+      localStorage.setItem('error', e)
       window.location.replace("/error");
     })
     .finally(() => {
