@@ -4,7 +4,7 @@ import { actionTypes } from "../../reducer";
 import { useNavigate } from 'react-router-dom';
 import Categories from "../../Categories";
 import './AddProduct.css'; // Import CSS file for consistent styling
-
+import TagsInput from "./tagsInput";
 const AddProduct = () => {
   const [, dispatch] = useStateValue();
   const navigate = useNavigate();
@@ -61,7 +61,7 @@ const AddProduct = () => {
     }, {});
 
     const category = newProduct.category === 'Other' ? newProduct.customCategory : newProduct.category;
-
+    console.log( { ...newProduct, category, specifications: specificationsObject, dateAdded: new Date().toISOString() })
     dispatch({
       type: actionTypes.ADD_PRODUCT,
       product: { ...newProduct, category, specifications: specificationsObject, dateAdded: new Date().toISOString() },
@@ -72,7 +72,7 @@ const AddProduct = () => {
   const handleCancel = () => {
     navigate('/your-products');
   };
-
+  const [tags, setTags] = useState([]);
   return (
     <div className="product-detail">
       <div className="product-detail-header">
@@ -151,7 +151,7 @@ const AddProduct = () => {
             onChange={handleInputChange}
           />
         </div>
-        <div className="form-group">
+        {/* <div className="form-group">
           <label>Tags:</label>
           <textarea
             name="tags"
@@ -168,7 +168,8 @@ const AddProduct = () => {
             style={{ resize: 'vertical' }}
             className="resize-textarea"
           />
-        </div>
+        </div> */}
+        <TagsInput newTag={tags} setNewTag={setTags} />
         <div className="form-group">
           <label>Key Features:</label>
           <textarea
