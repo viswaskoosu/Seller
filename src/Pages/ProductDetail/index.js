@@ -7,7 +7,7 @@ import { actionTypes } from '../../reducer';
 import './ProductDetail.css'; // Import CSS file
 import Carousel from '../../components/Carousel'; // Import Carousel component
 import ProductDetailInfo from '../ProductDetailInfo';
-
+import TagsInput from '../../components/TagsInput'
 const ProductDetail = () => {
   const { productId } = useParams();
   const [{ products }, dispatch] = useStateValue();
@@ -15,7 +15,9 @@ const ProductDetail = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [updatedProduct, setUpdatedProduct] = useState({});
-
+  const [tags, setTags] = useState(product.tags);
+  const [keyFeatures, setKeyFeatures] = useState(product.keyFeatures);
+  const [images, setImages] = useState(product.images);
   useEffect(() => {
     if (product) {
       // Convert specifications object to an array of key-value pairs
@@ -69,7 +71,6 @@ const ProductDetail = () => {
       acc[key] = value;
       return acc;
     }, {});
-
     dispatch({
       type: actionTypes.UPDATE_PRODUCT,
       product: { ...updatedProduct, specifications: specificationsObject },
@@ -156,7 +157,7 @@ const ProductDetail = () => {
               onChange={handleInputChange}
             />
           </div>
-          <div className='form-group'>
+          {/* <div className='form-group'>
             <label>Tags:</label>
             <textarea
               name="tags"
@@ -173,8 +174,10 @@ const ProductDetail = () => {
               style={{ resize: 'vertical' }}
               className='resize-textarea'
             />
-          </div>
-          <div className='form-group'>
+          </div> */}
+          <TagsInput newTag={tags} setNewTag={setTags} handleInputChange={handleInputChange} name='tags' displayName='Tags' />
+          <TagsInput newTag={keyFeatures} setNewTag={setKeyFeatures} handleInputChange={handleInputChange} name='keyFeatures' displayName='Key Features' />
+          {/* <div className='form-group'>
             <label>Key Features:</label>
             <textarea
               name="keyFeatures"
@@ -191,7 +194,7 @@ const ProductDetail = () => {
               style={{ resize: 'vertical' }}
               className='resize-textarea'
             />
-          </div>
+          </div> */}
           <div className='form-group'>
             <label>Specifications:</label>
             <div className='specifications'>
@@ -219,7 +222,7 @@ const ProductDetail = () => {
               <button onClick={handleAddSpecification}>Add Specification</button>
             </div>
           </div>
-          <div className='form-group'>
+          {/* <div className='form-group'>
             <label>Images:</label>
             <textarea
               name="images"
@@ -236,7 +239,8 @@ const ProductDetail = () => {
               style={{ resize: 'vertical' }}
               className='resize-textarea'
             />
-          </div>
+          </div> */}
+        <TagsInput newTag={images} setNewTag={setImages} handleInputChange={handleInputChange} name='images' displayName='Images' />
           <button className='save-button' onClick={handleSave}>Save</button>
           <button className='cancel-button' onClick={handleCancel}>Cancel</button>
         </div>

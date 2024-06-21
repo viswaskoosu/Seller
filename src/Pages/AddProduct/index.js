@@ -4,7 +4,7 @@ import { actionTypes } from "../../reducer";
 import { useNavigate } from 'react-router-dom';
 import Categories from "../../Categories";
 import './AddProduct.css'; // Import CSS file for consistent styling
-import TagsInput from "./tagsInput";
+import TagsInput from "../../components/TagsInput";
 import {postReq, displayError} from '../../Requests'
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -27,7 +27,7 @@ const AddProduct = () => {
     specifications: [],
     images: [],
   });
-  console.log(newProduct)
+  // console.log(newProduct)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewProduct((prev) => ({

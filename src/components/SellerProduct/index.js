@@ -1,3 +1,5 @@
+// src/components/SellerProduct/index.js
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './SellerProduct.css';
@@ -10,13 +12,14 @@ const SellerProduct = ({ id, onUpdate }) => {
   const [{ products }, dispatch] = useStateValue();
   const product = products.find(prod => prod.id === id);
   const [isLoading, setIsLoading] = useState(false)
-  // const [quantity, setQuantity] = useState(0);
+  const [quantity, setQuantity] = useState(0);
   const [feedback, setFeedback] = useState('');
-  // useEffect(() => {
-  //   if (product) {
-  //     setQuantity(product.available);
-  //   }
-  // }, [product]);
+
+  useEffect(() => {
+    if (product) {
+      setQuantity(product.available);
+    }
+  }, [product]);
 
   if (!product) {
     return <div>Product not found</div>;
@@ -39,48 +42,32 @@ const SellerProduct = ({ id, onUpdate }) => {
   };
 
   const increaseQuantity = () => {
-    postReq(setIsLoading, `/product/editproduct?request=QUANTITY&quantity=${product.available+1}&id=${id}`)
-    .then(() => {
-      dispatch({
-        type: actionTypes.SET_QUANTITY,
-        id: id,
-        quantity: product.available+1
-      })
-      // setQuantity(quantity + 1);
-    })
-    .catch((e) => {
-      displayError(e)
-    })
+    setQuantity(quantity + 1);
   };
 
   const decreaseQuantity = () => {
-    
-    if (product.available > 1) {
-      postReq(setIsLoading, `/product/editproduct?request=QUANTITY&quantity=${product.available-1}&id=${id}`)
-    .then(() => {
-      dispatch({
-        type: actionTypes.SET_QUANTITY,
-        id: id,
-        quantity: product.available-1
-      })
-      // setQuantity(quantity - 1);
-    })
-    .catch((e) => {
-      displayError(e)
-    })
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
     } else {
       deleteProduct();
     }
   };
 
   const saveChanges = () => {
-    dispatch({
-      type: actionTypes.UPDATE_PRODUCT_QUANTITY,
-      productId: id,
-      quantity: product.available,
-    });
-    setFeedback(`Quantity updated successfully to ${product.available}.`);
-    if (onUpdate) onUpdate();
+    postReq(setIsLoading, `/product/editproduct?request=SET_QUANTITY&id=${id}&quantity=${quantity}`)
+    .then(() => {
+      dispatch({
+        type: actionTypes.UPDATE_PRODUCT_QUANTITY,
+        productId: id,
+        quantity: quantity,
+      });
+      setFeedback(`Quantity updated successfully to ${quantity}.`);
+      if (onUpdate) onUpdate();
+    })
+    .catch((e) => {
+      displayError(e)
+    })
+    
   };
 
   return (
@@ -105,27 +92,20 @@ const SellerProduct = ({ id, onUpdate }) => {
           </Stack>
           <p className="rating-text">({product.rating}) Rated by {product.reviews?.length} users</p>
         </div>
-        <div className='quantity'>
-        <p>Current Quantity: </p>
-        <p className='value'>{product.available}</p>
-        </div>
-        <div className="button-group">
-        <div className='button-smallScreen'>
+        <p>Current Quantity: {quantity}</p>
+        <div>
           <button className="category-button" onClick={increaseQuantity}>
             Add more quantity 
           </button>
           <button className="category-button" onClick={decreaseQuantity}>
             Decrease quantity 
           </button>
-        </div>
-        <div className='button-smallScreen'>
-        <button className="category-button" onClick={deleteProduct}>
+          <button className="category-button" onClick={deleteProduct}>
             Delete Product
           </button>
           <button className="category-button" onClick={saveChanges}>
             Save Changes
           </button>
-        </div>
         </div>
         {feedback && <p className="feedback-message">{feedback}</p>}
       </div>
