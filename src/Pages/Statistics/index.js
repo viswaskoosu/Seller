@@ -1,32 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import dummySellingHistory from '../../dummySellingHistory'; // Adjust the path as per your file structure
 import { Bar, Line } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, Title, Tooltip, Legend, PointElement } from 'chart.js';
+
+// Register Chart.js components
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, Title, Tooltip, Legend, PointElement);
 
 function Statistics() {
-  const [filter, setFilter] = useState('all'); // Default filter is 'all'
-  const [customYear, setCustomYear] = useState(new Date().getFullYear().toString()); // Default custom year is current year
+  const [filter, setFilter] = useState('all');
+  const [customYear, setCustomYear] = useState(new Date().getFullYear().toString());
   const [filteredSalesData, setFilteredSalesData] = useState([]);
 
-  // Handle filter change
   const handleFilterChange = (e) => {
     const selectedFilter = e.target.value;
     setFilter(selectedFilter);
     if (selectedFilter !== 'custom') {
-      setCustomYear(new Date().getFullYear().toString()); // Reset custom year input when filter changes
+      setCustomYear(new Date().getFullYear().toString());
     }
   };
 
-  // Handle custom year input change
   const handleCustomYearChange = (e) => {
     const inputYear = e.target.value.trim();
     if (/^\d{4}$/.test(inputYear) && parseInt(inputYear, 10) <= new Date().getFullYear()) {
       setCustomYear(inputYear);
     } else {
-      setCustomYear(''); // Optionally handle invalid input state
+      setCustomYear('');
     }
   };
 
-  // Effect to update filtered data when filter or customYear changes
   useEffect(() => {
     const currentDate = new Date();
 
@@ -77,20 +78,17 @@ function Statistics() {
     setFilteredSalesData(filteredData);
   }, [filter, customYear]);
 
-  // Calculate total sales
   const totalSales = filteredSalesData.reduce((acc, item) => {
     return acc + item.transactions.reduce((total, transaction) => total + transaction.amount, 0);
   }, 0);
 
-  // Calculate product-wise sales
   const productSales = filteredSalesData.map(item => {
     const productTitle = item.product.title;
     const productTotalSales = item.transactions.reduce((total, transaction) => total + transaction.amount, 0);
-    const totalTransactions = item.transactions.reduce((total, transaction) => total + transaction.quantity, 0); // Total quantity sold
+    const totalTransactions = item.transactions.reduce((total, transaction) => total + transaction.quantity, 0);
     return { productTitle, productTotalSales, totalTransactions };
   });
 
-  // Prepare data for sales amount chart
   const salesChartData = {
     labels: productSales.map(product => product.productTitle),
     datasets: [
@@ -106,7 +104,6 @@ function Statistics() {
     ],
   };
 
-  // Prepare data for quantity sold chart
   const quantityChartData = {
     labels: productSales.map(product => product.productTitle),
     datasets: [
@@ -122,9 +119,8 @@ function Statistics() {
     ],
   };
 
-  // Prepare data for year-wise sales amount (if applicable)
   const yearWiseSalesChartData = () => {
-    if (filter === '1year' || filter === '2years' || filter === '5years' || filter === '10years') {
+    if (['1year', '2years', '5years', '10years'].includes(filter)) {
       const yearsCount = parseInt(filter.replace('years', ''), 10);
       const currentYear = new Date().getFullYear();
       const labels = Array.from({ length: yearsCount }, (_, index) => currentYear - yearsCount + 1 + index);
@@ -163,7 +159,6 @@ function Statistics() {
     return null;
   };
 
-  // Random color generator (for chart colors)
   const getRandomColor = () => {
     const r = Math.floor(Math.random() * 255);
     const g = Math.floor(Math.random() * 255);
@@ -171,7 +166,6 @@ function Statistics() {
     return `rgba(${r},${g},${b},0.2)`;
   };
 
-  // Render charts based on filter
   const renderCharts = () => {
     switch (filter) {
       case '1year':
@@ -184,7 +178,6 @@ function Statistics() {
             <Bar
               data={yearWiseSalesChartData()}
               options={{
-                maintainAspectRatio: true,
                 responsive: true,
                 scales: {
                   y: {
@@ -202,7 +195,6 @@ function Statistics() {
             <Line
               data={monthWiseSalesChartData()}
               options={{
-                maintainAspectRatio: true,
                 responsive: true,
                 scales: {
                   y: {
@@ -218,7 +210,6 @@ function Statistics() {
     }
   };
 
-  // Prepare data for month-wise sales amount (if custom year is selected)
   const monthWiseSalesChartData = () => {
     if (filter === 'custom') {
       const year = parseInt(customYear, 10);
@@ -256,7 +247,6 @@ function Statistics() {
     return null;
   };
 
-  // Find most and least sold products
   const mostSoldProduct = productSales.reduce((max, product) => (product.totalTransactions > max.totalTransactions ? product : max), { totalTransactions: -Infinity });
   const leastSoldProduct = productSales.reduce((min, product) => (product.totalTransactions < min.totalTransactions ? product : min), { totalTransactions: Infinity });
   const mostAmountSold = productSales.reduce((max, product) => (product.productTotalSales > max.productTotalSales ? product : max), { productTotalSales: -Infinity });
@@ -294,7 +284,6 @@ function Statistics() {
           <Bar
             data={salesChartData}
             options={{
-              maintainAspectRatio: true,
               responsive: true,
               scales: {
                 y: {
@@ -309,7 +298,6 @@ function Statistics() {
           <Bar
             data={quantityChartData}
             options={{
-              maintainAspectRatio: true,
               responsive: true,
               scales: {
                 y: {
