@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './SellerProduct.css';
 import { Rating, Stack } from '@mui/material';
-import { useStateValue } from '../../Context/StateProvider';
-import { actionTypes } from '../../reducer';
+import { useStateValue } from '../../Context/StateProvider'; 
+import { actionTypes } from '../../reducer'; 
+import {postReq, displayError} from '../../Requests'
 
 const SellerProduct = ({ id, onUpdate }) => {
   const [{ products }, dispatch] = useStateValue();
   const product = products.find(prod => prod.id === id);
-  
+  const [isLoading, setIsLoading] = useState(false)
   const [quantity, setQuantity] = useState(0);
   const [feedback, setFeedback] = useState('');
 
@@ -23,12 +24,19 @@ const SellerProduct = ({ id, onUpdate }) => {
   }
 
   const deleteProduct = () => {
-    dispatch({
-      type: actionTypes.DELETE_PRODUCT,
-      productId: id,
-    });
-    setFeedback(`Product ${product.title} deleted successfully.`);
-    if (onUpdate) onUpdate();
+    postReq(setIsLoading, `/product/editproduct?request=DELETE&id=${id}`)
+    .then(() => {
+      dispatch({
+        type: actionTypes.DELETE_PRODUCT,
+        productId: id,
+      });
+      setFeedback(`Product ${product.title} deleted successfully.`);
+      if (onUpdate) onUpdate();
+    })
+    .catch((e) => {
+      displayError(e)
+    })
+      
   };
 
   const increaseQuantity = () => {
