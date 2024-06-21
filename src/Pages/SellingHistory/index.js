@@ -5,19 +5,43 @@ import dummySellingHistory from '../../dummySellingHistory';
 
 function SellingHistory() {
   const [sellingHistory, setSellingHistory] = useState(dummySellingHistory);
+  const [filteredHistory, setFilteredHistory] = useState([]);
   const [filter, setFilter] = useState('all'); // Default filter option
+  const [customYear, setCustomYear] = useState(''); // State to hold custom year selection
+  const currentDate = new Date(); // Declare currentDate here
 
   const handleFilterChange = (event) => {
-    setFilter(event.target.value);
+    const value = event.target.value;
+    setFilter(value);
+
+    // Reset custom year selection if a predefined filter is selected
+    if (value !== 'custom') {
+      setCustomYear('');
+    }
+  };
+
+  const handleCustomYearChange = (event) => {
+    const value = event.target.value;
+    setCustomYear(value);
+
+    // Update filter state to 'custom' when a custom year is selected
+    setFilter('custom');
   };
 
   const filterAndSortHistory = () => {
-    const currentDate = new Date();
+    const currentDate = new Date(); // Declare currentDate here
+
     let fromDate;
 
     switch (filter) {
       case 'all':
-        return sellingHistory.slice().sort((a, b) => b.SoldDate - a.SoldDate); // Sort by SoldDate in descending order
+        return sellingHistory.flatMap(item =>
+          item.soldDate.map(date => ({
+            ...item,
+            soldDate: date
+          }))
+        ).sort((a, b) => b.soldDate - a.soldDate);
+
       case '3months':
         fromDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 3, currentDate.getDate());
         break;
@@ -33,25 +57,47 @@ function SellingHistory() {
       case '5years':
         fromDate = new Date(currentDate.getFullYear() - 5, currentDate.getMonth(), currentDate.getDate());
         break;
+      case 'custom':
+        if (!customYear) return sellingHistory; // Return original list if custom year is not selected
+
+        // Calculate fromDate based on custom year
+        fromDate = new Date(customYear, 0, 1); // January 1st of the selected custom year
+        const toDate = new Date(customYear, 11, 31, 23, 59, 59); // December 31st of the selected custom year
+
+        return sellingHistory
+          .flatMap(item =>
+            item.soldDate.map(date => ({
+              ...item,
+              soldDate: date
+            }))
+          )
+          .filter(item => item.soldDate >= fromDate.getTime() && item.soldDate <= toDate.getTime())
+          .sort((a, b) => b.soldDate - a.soldDate);
+
       default:
         return sellingHistory; // Return original list if filter is invalid
     }
 
     // Filter based on fromDate and sort by SoldDate in descending order
-    return sellingHistory.filter(item => item.SoldDate >= fromDate.getTime()).sort((a, b) => b.SoldDate - a.SoldDate);
+    return sellingHistory
+      .flatMap(item =>
+        item.soldDate.map(date => ({
+          ...item,
+          soldDate: date
+        }))
+      )
+      .filter(item => item.soldDate >= fromDate.getTime())
+      .sort((a, b) => b.soldDate - a.soldDate);
   };
 
   useEffect(() => {
-    const filteredHistory = filterAndSortHistory();
-    setSellingHistory(filteredHistory);
-  }, [filter, dummySellingHistory]); // Changed to `dummySellingHistory` to avoid resetting the state on each filter change
+    const filteredData = filterAndSortHistory();
+    setFilteredHistory(filteredData);
+  }, [filter, customYear, sellingHistory]); // Update when filter, customYear, or sellingHistory changes
 
   const formatDate = (timestamp) => {
     const dateObject = new Date(timestamp);
-    if (isNaN(dateObject.getTime())) {
-      return 'Invalid Date';
-    }
-    return dateObject.toLocaleDateString('en-US'); // Adjust locale as per your requirement
+    return isNaN(dateObject.getTime()) ? 'Invalid Date' : dateObject.toLocaleDateString('en-US');
   };
 
   const renderOrderStatus = (status) => {
@@ -72,7 +118,18 @@ function SellingHistory() {
           <option value="1year">Last 1 year</option>
           <option value="2years">Last 2 years</option>
           <option value="5years">Last 5 years</option>
+          <option value="custom">Custom Year</option>
         </select>
+
+        {/* Custom Year selection */}
+        {filter === 'custom' && (
+          <select id="customYear" value={customYear} onChange={handleCustomYearChange}>
+            <option value="">Select Year</option>
+            {Array.from({ length: 10 }, (v, i) => currentDate.getFullYear() - i).map((year, index) => (
+              <option key={index} value={year}>{year}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Selling history table */}
@@ -91,17 +148,17 @@ function SellingHistory() {
           </tr>
         </thead>
         <tbody>
-          {sellingHistory.map((item, index) => (
+          {filteredHistory.map((item, index) => (
             <tr key={index}>
               <td>
                 <Link to={`/product/${item.product.id}`}>{item.product.title}</Link>
               </td>
               <td>₹{item.price.toFixed(2)}</td>
               <td>{item.quantitySold}</td>
-              <td>₹{item.totalSaleAmount.toFixed(2)}</td>
+              <td>₹{(item.price * item.quantitySold).toFixed(2)}</td>
               <td>{item.buyer.name}</td>
               <td>{item.transactionId}</td>
-              <td>{formatDate(item.SoldDate)}</td>
+              <td>{formatDate(item.soldDate)}</td>
               <td>{item.paymentMethod}</td>
               <td>{renderOrderStatus(item.orderStatus)}</td>
             </tr>
