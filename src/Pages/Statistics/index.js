@@ -9,7 +9,7 @@ function Statistics() {
   const [sellingHistory, setSellingHistory] = useState([]);
   const [filter, setFilter] = useState('all');
   const [customYear, setCustomYear] = useState(new Date().getFullYear());
-
+  let startYear =new Date().getFullYear(); 
   useEffect(() => {
     const fetchData = async () => {
       setSellingHistory(dummySellingHistory);
@@ -99,30 +99,33 @@ function Statistics() {
   const getMonthlySales = (data) => {
     const monthlySales = {};
   
-    // Initialize months for the selected year(s)
-    const startYear = parseInt(filter === 'custom' ? customYear : new Date().getFullYear() - parseInt(filter.slice(0, 1)));
-    const endYear = new Date().getFullYear();
-    for (let year = startYear; year <= endYear; year++) {
+    // Initialize monthly sales for all months of the selected custom year
+    if (filter === 'custom') {
+      const selectedYear = parseInt(customYear);
       for (let month = 1; month <= 12; month++) {
-        monthlySales[`${year}-${month}`] = 0;
+        monthlySales[`${selectedYear}-${month}`] = 0;
+      }
+    } else {
+      // Initialize monthly sales for all months within the selected filter range
+      for (let year = new Date().getFullYear() - parseInt(filter.replace('years', '')) + 1; year <= new Date().getFullYear(); year++) {
+        for (let month = (year === new Date().getFullYear() - parseInt(filter.replace('years', '')) + 1 ? new Date().getMonth() + 1 : 1); month <= 12; month++) {
+          monthlySales[`${year}-${month}`] = 0;
+        }
       }
     }
   
-    // Populate with actual sales data
     data.forEach(sale => {
       sale.soldDate.forEach(date => {
         const saleDate = new Date(date);
         const year = saleDate.getFullYear();
         const month = saleDate.getMonth() + 1; // Month is zero-indexed
-        const monthYear = `${year}-${month}`;
   
-        if (saleDate <= new Date() && (
-          (filter === '1year' && year === new Date().getFullYear()) ||
-          (filter === '2years' && (year === new Date().getFullYear() || year === new Date().getFullYear() - 1)) ||
-          (filter === '5years' && (year >= new Date().getFullYear() - 4 && year <= new Date().getFullYear())) ||
-          (filter === '10years' && (year >= new Date().getFullYear() - 9 && year <= new Date().getFullYear())) ||
-          (filter === 'custom' && year === parseInt(customYear))
-        )) {
+        // Check if the sale is within the selected range
+        if (
+          (filter === 'custom' && year === parseInt(customYear)) ||
+          (filter !== 'custom' && year >= new Date().getFullYear() - parseInt(filter.replace('years', '')) + 1 && year <= new Date().getFullYear())
+        ) {
+          const monthYear = `${year}-${month}`;
           monthlySales[monthYear] += sale.price * sale.quantitySold;
         }
       });
@@ -131,20 +134,22 @@ function Statistics() {
     return monthlySales;
   };
   
-  
   const getYearlySales = (data) => {
     const yearlySales = {};
+  
+    // Initialize yearly sales for all years within the selected filter range
+    for (let year = new Date().getFullYear() - parseInt(filter.replace('years', '')) + 1; year <= new Date().getFullYear(); year++) {
+      yearlySales[year] = 0;
+    }
+  
     data.forEach(sale => {
       sale.soldDate.forEach(date => {
         const saleDate = new Date(date);
         const year = saleDate.getFullYear();
   
-        if (year === parseInt(customYear) && saleDate <= new Date()) { // Ensure sale is within selected year
-          if (yearlySales[year]) {
-            yearlySales[year] += sale.price * sale.quantitySold;
-          } else {
-            yearlySales[year] = sale.price * sale.quantitySold;
-          }
+        // Check if the sale is within the selected range
+        if (year >= new Date().getFullYear() - parseInt(filter.replace('years', '')) + 1 && year <= new Date().getFullYear()) {
+          yearlySales[year] += sale.price * sale.quantitySold;
         }
       });
     });
@@ -163,35 +168,67 @@ function Statistics() {
 
   const salesStats = getSalesStats(filteredData);
   const totalSales = calculateTotalSales(filteredData);
+  const monthNamesShort = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
   const renderChart = () => {
-    let chartData = [];
-  
-    if (filter === '1year' || filter === 'custom') {
-      chartData = Object.entries(getMonthlySales(filteredData)).map(([monthYear, amount]) => ({
-        monthYear,
-        amount
-      }));
-    } else {
-      chartData = Object.entries(getYearlySales(filteredData)).map(([year, amount]) => ({
-        year,
-        amount
-      }));
+  let chartData = [];
+
+  if (filter === 'custom') {
+    chartData = Object.entries(getMonthlySales(filteredData)).map(([monthYear, amount]) => ({
+      monthYear,
+      amount
+    }));
+    startYear = parseInt(customYear); // Assign customYear to startYear for custom filter
+  } else {
+    switch (filter) {
+      case '1year':
+        startYear = new Date().getFullYear() - 1;
+        break;
+      case '2years':
+        startYear = new Date().getFullYear() - 1;
+        break;
+      case '5years':
+        startYear = new Date().getFullYear() - 4;
+        break;
+      case '10years':
+        startYear = new Date().getFullYear() - 9;
+        break;
+      default:
+        startYear = new Date().getFullYear() - 1;
     }
-  
-    return (
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey={filter === '1year' || filter === 'custom' ? "monthYear" : "year"} />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="amount" fill="#8884d8" />
-        </BarChart>
-      </ResponsiveContainer>
-    );
-  };
-  
+
+    chartData = Object.entries(getYearlySales(filteredData)).map(([year, amount]) => ({
+      year,
+      amount
+    }));
+  }
+
+  return (
+    <ResponsiveContainer width="100%" height={400}>
+      <BarChart data={chartData}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis
+          dataKey={filter === 'custom' ? "monthYear" : "year"}
+          tickFormatter={(value) => {
+            if (filter === 'custom') {
+              const [year, month] = value.split('-');
+              return `${monthNamesShort[parseInt(month) - 1]} ${year}`;
+            } else {
+              return value;
+            }
+          }}
+        />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="amount" fill="#8884d8" />
+      </BarChart>
+    </ResponsiveContainer>
+  );
+};
+
   return (
     <div className="statistics-container">
       <h1>Sales Dashboard</h1>
