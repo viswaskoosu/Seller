@@ -17,6 +17,7 @@ import Addresses from "./Pages/SellerAddresses";
 import ProductDetailInfo from "./Pages/ProductDetailInfo";
 import SignIn from "./Pages/SignIn";
 import {ToastContainer} from 'react-toastify'
+import Statistics from "./Pages/Statistics";
 function App() {
   const [{ user }, dispatch] = useStateValue();
   const [isLoading, setIsLoading] = useState(true);
@@ -67,6 +68,7 @@ function App() {
           element={<ProductDetailInfo />}
         />
         <Route path="/seller-dashboard" element={<SellerDashboard />} />
+        <Route path="/seller-statistics" element={<Statistics />} />
         <Route path="/your-products" element={<YourProducts />} />
         <Route path="/selling-history" element={<SellingHistory />} />
         <Route path="/account" element={<SellerAccountPage />} />

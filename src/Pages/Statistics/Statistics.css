@@ -1,0 +1,29 @@
+/* Statistics.css */
+
+.statistics-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .statistics-filter {
+    margin-bottom: 20px;
+  }
+  
+  .statistics-summary {
+    margin-top: 20px;
+  }
+  
+  .statistics-summary h2, .statistics-summary h3 {
+    margin-bottom: 10px;
+  }
+  
+  .statistics-summary ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .statistics-summary ul li {
+    margin-bottom: 5px;
+  }
+  

@@ -22,6 +22,7 @@ const mainSections = [
   { label: 'Your Products', link: '/your-products' },
   { label: 'Selling History', link: '/selling-history' },
   { label: 'Account', link: '/account' },
+  { label: 'Statistics', link: '/seller-statistics' },
 ];
 
 const pages = ['Products', 'Pricing', 'Blog']; // General pages

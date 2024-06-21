@@ -1,60 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './SellingHistory.css';
-
-const dummySellingHistory = [
-  {
-    transactionId: 'abc123',
-    product: {
-      id: '6673be3a65bc991223ec3955',
-      title: 'LED Bulb',
-      price: 7.99,
-      mrp: 9.99,
-      category: 'Home requirements'
-    },
-    price: 25.5,
-    quantitySold: 2,
-    totalSaleAmount: 51,
-    buyer: {
-      id: '666b3653a34c6e81d0f94b0e',
-      name: 'Koosu Viswas'
-    },
-    paymentMethod: 'Credit Card',
-    orderStatus: 1, // 1 for Delivered
-    SoldDate: new Date('2024-05-15').getTime(), // Set date to 15th May 2024
-  },
-  {
-    transactionId: 'xyz789',
-    product: {
-      id: '6673be3a65bc991223ec396d',
-      title: 'Aluminium Panel',
-      price: 400,
-      mrp: 450,
-      category: 'Building Panels & Cladding Materials'
-    },
-    price: 15,
-    quantitySold: 1,
-    totalSaleAmount: 15,
-    buyer: {
-      id: '6673c1f365bc991223ec4fb3',
-      name: 'VISWAS KOOSU'
-    },
-    paymentMethod: 'PayPal',
-    orderStatus: 0, // 0 for Shipped
-    SoldDate: Date.now(),
-  },
-];
+import dummySellingHistory from '../../dummySellingHistory';
 
 function SellingHistory() {
   const [sellingHistory, setSellingHistory] = useState(dummySellingHistory);
   const [filter, setFilter] = useState('all'); // Default filter option
 
-  // Function to handle filter change
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
   };
 
-  // Function to filter and sort selling history based on the selected filter option
   const filterAndSortHistory = () => {
     const currentDate = new Date();
     let fromDate;
@@ -85,13 +41,11 @@ function SellingHistory() {
     return sellingHistory.filter(item => item.SoldDate >= fromDate.getTime()).sort((a, b) => b.SoldDate - a.SoldDate);
   };
 
-  // Update filtered and sorted history whenever filter or sellingHistory changes
   useEffect(() => {
     const filteredHistory = filterAndSortHistory();
     setSellingHistory(filteredHistory);
-  }, [filter, sellingHistory]);
+  }, [filter, dummySellingHistory]); // Changed to `dummySellingHistory` to avoid resetting the state on each filter change
 
-  // Function to format date as per requirement
   const formatDate = (timestamp) => {
     const dateObject = new Date(timestamp);
     if (isNaN(dateObject.getTime())) {
@@ -100,7 +54,6 @@ function SellingHistory() {
     return dateObject.toLocaleDateString('en-US'); // Adjust locale as per your requirement
   };
 
-  // Function to render order status based on the given orderStatus value
   const renderOrderStatus = (status) => {
     return status === 1 ? 'Delivered' : 'Shipped';
   };
