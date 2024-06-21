@@ -74,7 +74,7 @@ function App() {
         <Route path="/account" element={<SellerAccountPage />} />
         <Route path="/addproduct" element={<AddProduct />} />
         <Route path="/signup" element={<SignUp />} />
-        {/* <Route path="/seller-addresses" element={<Addresses />} /> */}
+        <Route path="/seller-addresses" element={<Addresses />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>

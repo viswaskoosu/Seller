@@ -1,11 +1,9 @@
-// src/components/SellerProduct/index.js
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './SellerProduct.css';
 import { Rating, Stack } from '@mui/material';
-import { useStateValue } from '../../Context/StateProvider'; 
-import { actionTypes } from '../../reducer'; 
+import { useStateValue } from '../../Context/StateProvider';
+import { actionTypes } from '../../reducer';
 
 const SellerProduct = ({ id, onUpdate }) => {
   const [{ products }, dispatch] = useStateValue();
@@ -77,20 +75,27 @@ const SellerProduct = ({ id, onUpdate }) => {
           </Stack>
           <p className="rating-text">({product.rating}) Rated by {product.reviews?.length} users</p>
         </div>
-        <p>Current Quantity: {quantity}</p>
-        <div>
+        <div className='quantity'>
+        <p>Current Quantity: </p>
+        <p className='value'>{quantity}</p>
+        </div>
+        <div className="button-group">
+        <div className='button-smallScreen'>
           <button className="category-button" onClick={increaseQuantity}>
             Add more quantity 
           </button>
           <button className="category-button" onClick={decreaseQuantity}>
             Decrease quantity 
           </button>
-          <button className="category-button" onClick={deleteProduct}>
+        </div>
+        <div className='button-smallScreen'>
+        <button className="category-button" onClick={deleteProduct}>
             Delete Product
           </button>
           <button className="category-button" onClick={saveChanges}>
             Save Changes
           </button>
+        </div>
         </div>
         {feedback && <p className="feedback-message">{feedback}</p>}
       </div>
