@@ -1,19 +1,10 @@
 import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
+import { AppBar, Box, Toolbar, IconButton, Button, InputBase, Container } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
 import SearchIcon from '@mui/icons-material/Search';
-import TextField from '@mui/material/TextField';
 import { Link, useNavigate } from 'react-router-dom';
 import CompanyLogo from './companyLogo.png';
 import "./Header.css";
-import { InputBase, MenuItem } from '@mui/material';
 import ProductsIcon from '@mui/icons-material/Category';
 import HistoryIcon from '@mui/icons-material/History';
 import AccountIcon from '@mui/icons-material/AccountCircle';
@@ -27,9 +18,10 @@ const mainSections = [
 ];
 
 function Header() {
-  const [anchorElNav, ] = React.useState(null);
+  const [anchorElNav] = React.useState(null);
   const [searchQuery, setSearchQuery] = React.useState('');
-const navigate = useNavigate();
+  const navigate = useNavigate();
+
   const handleSearch = () => {
     if (searchQuery.trim() !== '') {
       navigate(`/search-results/${encodeURIComponent(searchQuery)}`);
@@ -38,7 +30,7 @@ const navigate = useNavigate();
 
   return (
     <AppBar position="static">
-      <Container maxWidth="100%" sx={{ overflowX: 'hidden' }}>
+      <Container maxWidth="100%" sx={{ overflowX: { xs: 'visible', sm: 'hidden' } }}>
         <Toolbar disableGutters>
           <Link to="/">
             <img
@@ -47,9 +39,7 @@ const navigate = useNavigate();
               alt="logo"
             />
           </Link>
-
-
-<Box
+          <Box
             sx={{
               display: "flex",
               flexGrow: 1,
@@ -78,13 +68,10 @@ const navigate = useNavigate();
                 width: "100%",
               }}
             />
-
             <IconButton type="submit" sx={{ p: "10px", ml: 1 }} onClick={handleSearch}>
               <SearchIcon />
             </IconButton>
           </Box>
-
-
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
             {mainSections.map((section) => (
               <Button
@@ -92,7 +79,7 @@ const navigate = useNavigate();
                 component={Link}
                 to={section.link}
                 startIcon={section.icon}
-                sx={{ ml : 1, color: 'inherit', display: { xs: 'none', md: 'flex' } }}
+                sx={{ ml: 1, color: 'inherit', display: { xs: 'none', md: 'flex' } }}
               >
                 {section.label}
               </Button>
@@ -102,7 +89,7 @@ const navigate = useNavigate();
                 key={section.label}
                 component={Link}
                 to={section.link}
-                sx={{ ml : 1, color: 'inherit', display: { xs: 'flex', md: 'none' } }}
+                sx={{ ml: 1, color: 'inherit', display: { xs: 'flex', md: 'none' } }}
               >
                 {section.icon}
               </IconButton>

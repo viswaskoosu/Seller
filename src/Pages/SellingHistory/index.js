@@ -86,68 +86,68 @@ function SellingHistory() {
 
   return (
     <div className='selling'>
-    <Header/>
-    <div className="selling-history-container">
-      <h1 className="selling-history-title">Selling History</h1>
-      <div className="selling-history-filter">
-        <label htmlFor="filter">Filter by:</label>
-        <select id="filter" value={filter} onChange={handleFilterChange}>
-          <option value="all">All</option>
-          <option value="3months">Last 3 months</option>
-          <option value="6months">Last 6 months</option>
-          <option value="1year">Last 1 year</option>
-          <option value="2years">Last 2 years</option>
-          <option value="5years">Last 5 years</option>
-          <option value="custom">Custom Year</option>
-        </select>
-        {filter === 'custom' && (
-          <select id="customYear" value={customYear} onChange={handleCustomYearChange}>
-            <option value="">Select Year</option>
-            {Array.from({ length: 10 }, (v, i) => currentDate.getFullYear() - i).map((year, index) => (
-              <option key={index} value={year}>{year}</option>
-            ))}
+      {/* <Header /> */}
+      <div className="selling-history-container">
+        <h1 className="selling-history-title">Selling History</h1>
+        <div className="selling-history-filter">
+          <label htmlFor="filter">Filter by:</label>
+          <select id="filter" value={filter} onChange={handleFilterChange}>
+            <option value="all">All</option>
+            <option value="3months">Last 3 months</option>
+            <option value="6months">Last 6 months</option>
+            <option value="1year">Last 1 year</option>
+            <option value="2years">Last 2 years</option>
+            <option value="5years">Last 5 years</option>
+            <option value="custom">Custom Year</option>
           </select>
-        )}
-      </div>
-      <table className="selling-history-table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Amount</th>
-            <th>Quantity Sold</th>
-            <th>Total Sale Amount</th>
-            <th>Buyer</th>
-            <th>Transaction ID</th>
-            <th>Date</th>
-            <th>Payment Method</th>
-            <th>Order Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredHistory.length > 0 ? (
-            filteredHistory.map((transaction) => (
-              <tr key={transaction.transactionId}>
-                <td data-label="Title">
-                  <Link to={`/product/${transaction.productId}`}>{transaction.title}</Link>
-                </td>
-                <td data-label="Amount">{`₹${transaction.amount}`}</td>
-                <td data-label="Quantity Sold">{transaction.quantity}</td>
-                <td data-label="Total Sale Amount">{transaction.amount}</td>
-                <td data-label="Buyer">{transaction.buyer.name}</td>
-                <td data-label="Transaction ID">{transaction.transactionId}</td>
-                <td data-label="Date">{formatDate(transaction.soldDate)}</td>
-                <td data-label="Payment Method">{transaction.paymentMethod}</td>
-                <td data-label="Order Status">{renderOrderStatus(transaction.orderStatus)}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="9">No data available</td>
-            </tr>
+          {filter === 'custom' && (
+            <select id="customYear" value={customYear} onChange={handleCustomYearChange}>
+              <option value="">Select Year</option>
+              {Array.from({ length: 10 }, (v, i) => currentDate.getFullYear() - i).map((year, index) => (
+                <option key={index} value={year}>{year}</option>
+              ))}
+            </select>
           )}
-        </tbody>
-      </table>
-    </div>
+        </div>
+        <table className="selling-history-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Amount</th>
+              <th>Quantity Sold</th>
+              <th>Total Sale Amount</th>
+              <th>Buyer</th>
+              <th>Transaction ID</th>
+              <th>Date</th>
+              <th>Payment Method</th>
+              <th>Order Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredHistory.length > 0 ? (
+              filteredHistory.map((transaction) => (
+                <tr key={transaction.transactionId}>
+                  <td data-label="Title">
+                    <Link to={`/product/${transaction.productId}`}>{transaction.title}</Link>
+                  </td>
+                  <td data-label="Amount">{`₹${transaction.amount}`}</td>
+                  <td data-label="Quantity Sold">{transaction.quantity}</td>
+                  <td data-label="Total Sale Amount">{transaction.amount}</td>
+                  <td data-label="Buyer">{transaction.buyer.name}</td>
+                  <td data-label="Transaction ID">{transaction.transactionId}</td>
+                  <td data-label="Date">{formatDate(transaction.soldDate)}</td>
+                  <td data-label="Payment Method">{transaction.paymentMethod}</td>
+                  <td data-label="Order Status">{renderOrderStatus(transaction.orderStatus)}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="9">No data available</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
