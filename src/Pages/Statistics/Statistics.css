@@ -1,84 +1,134 @@
 /* Statistics.css */
-a{
-    text-decoration: none;
-    color: black;
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f0f2f5;
+  margin: 0;
 }
-.statistics-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+
+.statistics {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+}
+
+.filter-section label {
+  font-weight: 500;
+  margin-right: 10px;
+}
+
+.filter-section select, .filter-section input {
+  padding: 8px;
+  font-size: 14px;
+  margin-right: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.filter-section select:hover, .filter-section input:hover {
+  border-color: #888;
+}
+
+.filter-section input {
+  width: 100px;
+}
+
+.chart {
+  margin-bottom: 40px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pie-charts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-bottom: 40px;
+}
+
+.pie-charts > div {
+  width: 45%;
+  min-width: 300px;
+  margin: 20px 0;
+}
+
+.pie-charts h3 {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.statistics-summary {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.statistics-summary h3 {
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.statistics-summary p {
+  margin: 8px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.chart canvas {
+  max-height: 400px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .pie-charts > div {
+    width: 100%;
+    margin: 10px 0;
   }
-  
-  .statistics-filter {
-    margin-bottom: 20px;
+
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  .statistics-filter label {
-    font-weight: bold;
+
+  .filter-section select, .filter-section input {
+    margin: 10px 0;
   }
-  
-  .statistics-filter select {
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    width: 150px;
-    appearance: none; /* Remove default arrow icon */
-    background-color: #fff;
-    background-image: linear-gradient(45deg, transparent 50%, #888 50%), linear-gradient(135deg, #888 50%, transparent 50%);
-    background-position: calc(100% - 12px) calc(1em + 2px), calc(100% - 7px) calc(1em + 2px);
-    background-size: 5px 5px, 5px 5px;
-    background-repeat: no-repeat;
-    padding-right: 30px;
-  }
-  
-  .statistics-filter select:focus {
-    outline: none;
-    border-color: #66afe9;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-  }
-  
-  .statistics-filter select:hover {
-    cursor: pointer;
-  }
-  
-  .statistics-filter input[type="number"] {
-    padding: 8px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-left: 10px;
-  }
-  
-  .statistics-summary {
-    margin-top: 20px;
-  }
-  
-  .statistics-summary h2,
-  .statistics-summary h3 {
-    margin-bottom: 10px;
-  }
-  
-  .statistics-summary ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .statistics-summary ul li {
-    margin-bottom: 5px;
-  }
-  
-  .statistics-chart {
-    margin-top: 20px;
-  }
-  .charts-container {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .chart {
-    width: 45%; /* Adjust as needed */
-    margin-bottom: 20px;
-  }
-  
+}
+
+/* Hover effects for better interaction */
+.filter-section select:hover, .filter-section input:hover {
+  border-color: #888;
+}
+
+.filter-section select:focus, .filter-section input:focus {
+  border-color: #555;
+  outline: none;
+}
+
+.chart:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.pie-charts div:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+}
+
+.statistics-summary p:hover {
+  color: #007bff;
+  transition: color 0.3s ease;
+}

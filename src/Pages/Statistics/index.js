@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import dummySellingHistory from '../../dummySellingHistory'; // Adjust the path as per your file structure
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, ArcElement, Title, Tooltip, Legend, PointElement } from 'chart.js';
-
+import './Statistics.css'
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, ArcElement, Title, Tooltip, Legend, PointElement);
 
@@ -131,7 +131,7 @@ function Statistics() {
         borderWidth: 1,
         hoverBackgroundColor: 'rgba(75,192,192,0.4)',
         hoverBorderColor: 'rgba(75,192,192,1)',
-        data: data.map(d => d[dataKey].toFixed(2)),
+        data: data.map(d => d[dataKey]),
       },
     ],
   });
@@ -241,7 +241,7 @@ function Statistics() {
       {
         label: 'Total Amount Earned',
         backgroundColor: productSales.map(() => getRandomColor()),
-        data: productSales.map(product => product.totalAmount.toFixed(2)),
+        data: productSales.map(product => product.totalAmount),
       },
     ],
   };
@@ -262,6 +262,13 @@ function Statistics() {
           <option value="10years">Last 10 years</option>
           <option value="custom">Custom Year</option>
         </select>
+        <div className="statistics-summary">
+        <h3>Sales Summary</h3>
+        <p>Most Sold Product (Quantity): {mostSoldProduct.productTitle} ({mostSoldProduct.totalQuantity})</p>
+        <p>Least Sold Product (Quantity): {leastSoldProduct.productTitle} ({leastSoldProduct.totalQuantity})</p>
+        <p>Most Amount Earned (Product): {mostAmountSold.productTitle} ( ₹{mostAmountSold.totalAmount})</p>
+        <p>Least Amount Earned (Product): {leastAmountSold.productTitle} ( ₹{leastAmountSold.totalAmount})</p>
+      </div>
         {filter === 'custom' && (
           <input
             type="text"
@@ -284,7 +291,7 @@ function Statistics() {
             plugins: {
               tooltip: {
                 callbacks: {
-                  label: (context) => `${context.label}: ${context.raw.toFixed(2)}`,
+                  label: (context) => `${context.label}: ${context.raw}`,
                 },
               },
             },
@@ -299,7 +306,7 @@ function Statistics() {
             plugins: {
               tooltip: {
                 callbacks: {
-                  label: (context) => `${context.label}: ${context.raw.toFixed(2)}`,
+                  label: (context) => `${context.label}: ${context.raw}`,
                 },
               },
             },
@@ -307,13 +314,7 @@ function Statistics() {
         />
       </div>
 
-      <div className="statistics-summary">
-        <h3>Sales Summary</h3>
-        <p>Most Sold Product (Quantity): {mostSoldProduct.productTitle} ({mostSoldProduct.totalQuantity})</p>
-        <p>Least Sold Product (Quantity): {leastSoldProduct.productTitle} ({leastSoldProduct.totalQuantity})</p>
-        <p>Most Amount Earned (Product): {mostAmountSold.productTitle} (${mostAmountSold.totalAmount.toFixed(2)})</p>
-        <p>Least Amount Earned (Product): {leastAmountSold.productTitle} (${leastAmountSold.totalAmount.toFixed(2)})</p>
-      </div>
+
     </div>
   );
 }
