@@ -1,26 +1,23 @@
-// src/Pages/SellerAccountPage.js
-
 import React, { useState, useEffect } from 'react';
 import './AccountPage.css';
 import Default from './default.png';
 import USER from './user.png';
-import contact from './contact.png';
+// import Contact from './contact.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStateValue } from '../../Context/StateProvider';
+import { AccountCircle, Equalizer, ShoppingCart, History, Mail, Payment, LocationOn, ContactSupport } from '@mui/icons-material';
 
 function SellerAccountPage() {
   const [{ user }, dispatch] = useStateValue();
-  const [state,] = useStateValue()
   const [image, setImage] = useState(""); 
   const navigate = useNavigate();
 
   const logout = () => {
     localStorage.removeItem("user");
-    console.log(state)
     dispatch({
       type: "USER_LOGOUT",
     });
-    navigate('/signin')
+    navigate('/signin');
   };
 
   const checkDP = () => {
@@ -70,25 +67,34 @@ function SellerAccountPage() {
                 <div className="personal-name">
                   <div className="name-section">
                     <p className="name-data">Name</p>
-                    <img src={USER} className="user-photo" alt="User Icon" />
+                    <AccountCircle style={{ color: '#1976d2' }} />
                   </div>
                   <p className="users-name">{user ? `${user.displayName}` : ""}</p>
                 </div>
                 <Link to="/seller-dashboard" className="accountPage_section">
                   <div>
-                    <h3>Seller Statistics</h3>
+                  <div className="name-section">
+                  <h3>Seller Statistics</h3>
+                  <Equalizer style={{ color: '#1976d2' }} />
+                  </div>
                     <p>View your sales performance</p>
                   </div>
                 </Link>
                 <Link to='/your-products' className="accountPage_section">
                   <div>
-                    <h3>Your Products</h3>
+                  <div className="name-section">
+                  <h3>Your Products</h3>
+                  <ShoppingCart style={{ color: '#1976d2' }} />
+                  </div>
                     <p>View and manage the products you're selling</p>
                   </div>
                 </Link>
                 <Link to="/selling-history" className="accountPage_section">
                   <div>
-                    <h3>Selling History</h3>
+                  <div className="name-section">
+                  <h3>Selling History</h3>
+                  <History style={{ color: '#1976d2' }} />
+                  </div>
                     <p>Review your past sales and earnings</p>
                   </div>
                 </Link>
@@ -96,7 +102,7 @@ function SellerAccountPage() {
                   <div className="contact-info">
                     <div className="mail-section">
                       <p className="mail-data">Contact Information</p>
-                      <img src={contact} className="mail-photo" alt="Contact Icon" />
+                      <Mail style={{ color: '#1976d2' }} />
                     </div>
                     <div>
                       <p>{user && user.email ? user.email : "Please update your Email"}</p>
@@ -107,7 +113,10 @@ function SellerAccountPage() {
                 </Link>
                 <Link to="/payment-methods" className="accountPage_section">
                   <div>
-                    <h3>Payment Methods</h3>
+                  <div className="name-section">
+                  <h3>Payment Methods</h3>
+                  <Payment style={{ color: '#1976d2' }} />
+                  </div>
                     {user && user.paymentMethods && user.paymentMethods.length > 0 ? (
                       <ul className="accountPage_list">
                         {user.paymentMethods.map((method) => (
@@ -123,13 +132,19 @@ function SellerAccountPage() {
                 </Link>
                 <Link to="/seller-addresses" className="accountPage_section">
                   <div>
-                    <h3>Your Addresses</h3>
+                  <div className="name-section">
+                  <h3>Your Addresses</h3>
+                  <LocationOn style={{ color: '#1976d2' }} />
+                  </div>
                     <p>Edit addresses and add new ones</p>
                   </div>
                 </Link>
                 <Link to="/contact-us" className="accountPage_section">
                   <div>
-                    <h3>Contact Us</h3>
+                  <div className="name-section">
+                  <h3>Contact Us</h3>
+                  <ContactSupport style={{ color: '#1976d2' }} />
+                  </div>
                     <p>Get in touch with us</p>
                   </div>
                 </Link>
