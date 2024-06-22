@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./Pages/Home";
 import ProductDetail from "./Pages/ProductDetail";
 import ErrorPage from "./Pages/Error";
-import SellerDashboard from "./Pages/SellerDashboard";
 import YourProducts from "./Pages/YourProducts";
 import SellingHistory from "./Pages/SellingHistory";
 import { useStateValue } from "./Context/StateProvider";
@@ -83,7 +82,6 @@ function App() {
           path="/product-preview/:productId"
           element={<ProductDetailInfo />}
         />
-        <Route path="/seller-dashboard" element={<SellerDashboard />} />
         <Route path="/seller-statistics" element={<Statistics />} />
         <Route path="/your-products" element={<YourProducts />} />
         <Route path="/selling-history" element={<SellingHistory />} />

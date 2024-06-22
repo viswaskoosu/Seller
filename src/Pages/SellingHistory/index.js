@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './SellingHistory.css';
 import dummySellingHistory from '../../dummySellingHistory';
+import Header from '../../components/Header';
 
 function SellingHistory() {
   const [sellingHistory, setSellingHistory] = useState(dummySellingHistory);
@@ -26,14 +27,11 @@ function SellingHistory() {
 
   const filterAndSortHistory = () => {
     let fromDate;
+    let toDate;
 
     switch (filter) {
       case 'all':
-        return sellingHistory.slice().sort((a, b) => {
-          const lastSoldDateA = a.transactions[0].soldDate;
-          const lastSoldDateB = b.transactions[0].soldDate;
-          return lastSoldDateB - lastSoldDateA;
-        });
+        return sellingHistory.flatMap(product => product.transactions).sort((a, b) => b.soldDate - a.soldDate);
 
       case '3months':
         fromDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 3, 1);
@@ -51,30 +49,16 @@ function SellingHistory() {
         fromDate = new Date(currentDate.getFullYear() - 5, currentDate.getMonth(), 1);
         break;
       case 'custom':
-        if (!customYear) return sellingHistory;
+        if (!customYear) return sellingHistory.flatMap(product => product.transactions).sort((a, b) => b.soldDate - a.soldDate);
         fromDate = new Date(customYear, 0, 1);
-        const toDate = new Date(customYear, 11, 31, 23, 59, 59);
-        return sellingHistory.filter(product => {
-          const lastTransactionDate = product.transactions[0].soldDate;
-          return lastTransactionDate >= fromDate && lastTransactionDate <= toDate;
-        }).sort((a, b) => {
-          const lastSoldDateA = a.transactions[0].soldDate;
-          const lastSoldDateB = b.transactions[0].soldDate;
-          return lastSoldDateB - lastSoldDateA;
-        });
+        toDate = new Date(customYear, 11, 31, 23, 59, 59);
+        return sellingHistory.flatMap(product => product.transactions).filter(transaction => transaction.soldDate >= fromDate.getTime() && transaction.soldDate <= toDate.getTime()).sort((a, b) => b.soldDate - a.soldDate);
 
       default:
-        return sellingHistory;
+        return sellingHistory.flatMap(product => product.transactions).sort((a, b) => b.soldDate - a.soldDate);
     }
 
-    return sellingHistory.filter(product => {
-      const lastTransactionDate = product.transactions[0].soldDate;
-      return lastTransactionDate >= fromDate;
-    }).sort((a, b) => {
-      const lastSoldDateA = a.transactions[0].soldDate;
-      const lastSoldDateB = b.transactions[0].soldDate;
-      return lastSoldDateB - lastSoldDateA;
-    });
+    return sellingHistory.flatMap(product => product.transactions).filter(transaction => transaction.soldDate >= fromDate.getTime()).sort((a, b) => b.soldDate - a.soldDate);
   };
 
   useEffect(() => {
@@ -100,39 +84,9 @@ function SellingHistory() {
     }
   };
 
-  const renderTransactions = (product) => {
-    if (!product.transactions || product.transactions.length === 0) {
-      return (
-        <tr key={product.product.id}>
-          <td colSpan="9">No transactions available</td>
-        </tr>
-      );
-    }
-
-    return product.transactions.map((transaction, index) => (
-      <tr key={transaction.transactionId}>
-        {index === 0 ? (
-          <>
-            <td rowSpan={product.transactions.length}>
-              <Link to={`/product/${product.product.id}`}>{product.product.title}</Link>
-            </td>
-            <td rowSpan={product.transactions.length}>
-              {product.product.price ? `₹${product.product.price.toFixed(2)}` : 'Price N/A'}
-            </td>
-          </>
-        ) : null}
-        <td>{transaction.quantity}</td>
-        <td>{transaction.amount.toFixed(2)}</td>
-        <td>{transaction.buyer.name}</td>
-        <td>{transaction.transactionId}</td>
-        <td>{formatDate(transaction.soldDate)}</td>
-        <td>{transaction.paymentMethod}</td>
-        <td>{renderOrderStatus(transaction.orderStatus)}</td>
-      </tr>
-    ));
-  };
-
   return (
+    <div className='selling'>
+    <Header/>
     <div className="selling-history-container">
       <h1 className="selling-history-title">Selling History</h1>
       <div className="selling-history-filter">
@@ -159,7 +113,7 @@ function SellingHistory() {
         <thead>
           <tr>
             <th>Title</th>
-            <th>Price</th>
+            <th>Amount</th>
             <th>Quantity Sold</th>
             <th>Total Sale Amount</th>
             <th>Buyer</th>
@@ -171,7 +125,21 @@ function SellingHistory() {
         </thead>
         <tbody>
           {filteredHistory.length > 0 ? (
-            filteredHistory.map((product) => renderTransactions(product))
+            filteredHistory.map((transaction) => (
+              <tr key={transaction.transactionId}>
+                <td data-label="Title">
+                  <Link to={`/product/${transaction.productId}`}>{transaction.title}</Link>
+                </td>
+                <td data-label="Amount">{`₹${transaction.amount}`}</td>
+                <td data-label="Quantity Sold">{transaction.quantity}</td>
+                <td data-label="Total Sale Amount">{transaction.amount}</td>
+                <td data-label="Buyer">{transaction.buyer.name}</td>
+                <td data-label="Transaction ID">{transaction.transactionId}</td>
+                <td data-label="Date">{formatDate(transaction.soldDate)}</td>
+                <td data-label="Payment Method">{transaction.paymentMethod}</td>
+                <td data-label="Order Status">{renderOrderStatus(transaction.orderStatus)}</td>
+              </tr>
+            ))
           ) : (
             <tr>
               <td colSpan="9">No data available</td>
@@ -179,6 +147,7 @@ function SellingHistory() {
           )}
         </tbody>
       </table>
+    </div>
     </div>
   );
 }

@@ -76,8 +76,8 @@ function SellerAccountPage() {
                 </div>
                 <Link to="/seller-dashboard" className="accountPage_section">
                   <div>
-                    <h3>Seller Dashboard</h3>
-                    <p>Manage your products and view your sales performance</p>
+                    <h3>Seller Statistics</h3>
+                    <p>View your sales performance</p>
                   </div>
                 </Link>
                 <Link to='/your-products' className="accountPage_section">

@@ -3,6 +3,7 @@ import dummySellingHistory from '../../dummySellingHistory'; // Adjust the path 
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, ArcElement, Title, Tooltip, Legend, PointElement } from 'chart.js';
 import './Statistics.css'
+import { Link } from 'react-router-dom';
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, ArcElement, Title, Tooltip, Legend, PointElement);
 
@@ -97,7 +98,6 @@ function Statistics() {
 
     return data;
   };
-
   const getMonthlyData = () => {
     const year = parseInt(customYear, 10);
     const months = Array.from({ length: 12 }, (_, index) => new Date(year, index, 1).toLocaleString('default', { month: 'short' }));
@@ -149,16 +149,16 @@ function Statistics() {
         <div className="chart">
           <h3>{`Sales Data for the Last ${yearsCount} Years`}</h3>
           <Bar
-            data={quantityData}
-            options={{
-              responsive: true,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                },
+          data={quantityData}
+          options={{
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
               },
-            }}
-          />
+            },
+          }}
+        />
           <Bar
             data={amountData}
             options={{
@@ -211,10 +211,11 @@ function Statistics() {
   };
 
   const productSales = filteredSalesData.map(item => {
+    const id = item.product.id;
     const productTitle = item.product.title;
     const totalQuantity = item.transactions.reduce((total, transaction) => total + transaction.quantity, 0);
     const totalAmount = item.transactions.reduce((total, transaction) => total + transaction.amount, 0);
-    return { productTitle, totalQuantity, totalAmount };
+    return { productTitle, totalQuantity, totalAmount, id };
   });
 
   const getRandomColor = () => {
@@ -250,7 +251,6 @@ function Statistics() {
   const leastSoldProduct = productSales.reduce((min, product) => (product.totalQuantity < min.totalQuantity ? product : min), { totalQuantity: Infinity });
   const mostAmountSold = productSales.reduce((max, product) => (product.totalAmount > max.totalAmount ? product : max), { totalAmount: -Infinity });
   const leastAmountSold = productSales.reduce((min, product) => (product.totalAmount < min.totalAmount ? product : min), { totalAmount: Infinity });
-
   return (
     <div className="statistics">
       <div className="filter-section">
@@ -262,13 +262,7 @@ function Statistics() {
           <option value="10years">Last 10 years</option>
           <option value="custom">Custom Year</option>
         </select>
-        <div className="statistics-summary">
-        <h3>Sales Summary</h3>
-        <p>Most Sold Product (Quantity): {mostSoldProduct.productTitle} ({mostSoldProduct.totalQuantity})</p>
-        <p>Least Sold Product (Quantity): {leastSoldProduct.productTitle} ({leastSoldProduct.totalQuantity})</p>
-        <p>Most Amount Earned (Product): {mostAmountSold.productTitle} ( ₹{mostAmountSold.totalAmount})</p>
-        <p>Least Amount Earned (Product): {leastAmountSold.productTitle} ( ₹{leastAmountSold.totalAmount})</p>
-      </div>
+        
         {filter === 'custom' && (
           <input
             type="text"
@@ -279,7 +273,26 @@ function Statistics() {
           />
         )}
       </div>
+      <div className="statistics-summary">
+        <h3>Sales Summary</h3>
+        {console.log(mostSoldProduct.id)}
+      <Link to={`/product/${mostSoldProduct.id}`}>
+        <p>Most Sold Product (Quantity): {mostSoldProduct.productTitle} ({mostSoldProduct.totalQuantity})</p>
+      </Link>
 
+      <Link to={`/product/${leastSoldProduct.id}`}>
+      <p>Least Sold Product (Quantity): {leastSoldProduct.productTitle} ({leastSoldProduct.totalQuantity})</p>
+      </Link>
+
+
+      <p>Most Amount Earned (Product): {mostAmountSold.productTitle} ( ₹{mostAmountSold.totalAmount})</p>
+      <Link to={`/product/${mostAmountSold.id}`}>
+      </Link>
+
+      <Link to={`/product/${leastAmountSold.id}`}>
+      <p>Least Amount Earned (Product): {leastAmountSold.productTitle} ( ₹{leastAmountSold.totalAmount})</p>
+      </Link>
+      </div>
       {renderChart()}
 
       <div className="pie-charts">

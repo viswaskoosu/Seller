@@ -1,4 +1,10 @@
 /* SellingHistory.css */
+/* Define the default styles for the selling button */
+.selling.Button {
+
+      display: flex;
+  
+}
 
 .selling-history-container {
   max-width: 1200px;
