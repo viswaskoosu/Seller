@@ -284,21 +284,22 @@ function Statistics() {
       </div>
     )}
       </div>
-      <div className="statistics-summary">
-        <h3>Sales Summary</h3>
-        <Link to={`/product/${mostSoldProduct.id}`}>
-          <p>Most Sold Product (Quantity): {mostSoldProduct.productTitle} ({mostSoldProduct.totalQuantity})</p>
+  <div className="statistics-summary">
+    <h3>Sales Summary</h3>
+        <Link to={`/product/${mostSoldProduct?.id}`}>
+          <p>Most Sold Product (Quantity): {mostSoldProduct?.productTitle} ({mostSoldProduct?.totalQuantity})</p>
         </Link>
-        <Link to={`/product/${leastSoldProduct.id}`}>
-          <p>Least Sold Product (Quantity): {leastSoldProduct.productTitle} ({leastSoldProduct.totalQuantity})</p>
+        <Link to={`/product/${leastSoldProduct?.id}`}>
+          <p>Least Sold Product (Quantity): {leastSoldProduct?.productTitle} ({leastSoldProduct?.totalQuantity})</p>
         </Link>
-        <Link to={`/product/${mostAmountSold.id}`}>
-          <p>Most Amount Earned (Product): {mostAmountSold.productTitle} ( ₹{mostAmountSold.totalAmount})</p>
+        <Link to={`/product/${mostAmountSold?.id}`}>
+          <p>Most Amount Earned (Product): {mostAmountSold?.productTitle} (₹{mostAmountSold?.totalAmount})</p>
         </Link>
-        <Link to={`/product/${leastAmountSold.id}`}>
-          <p>Least Amount Earned (Product): {leastAmountSold.productTitle} ( ₹{leastAmountSold.totalAmount})</p>
+        <Link to={`/product/${leastAmountSold?.id}`}>
+          <p>Least Amount Earned (Product): {leastSoldProduct?.productTitle} (₹{leastAmountSold?.totalAmount})</p>
         </Link>
-      </div>
+  </div>
+
       {renderChart()}
       <div className="pie-charts">
         <h3>Product Sales Distribution (Quantity)</h3>

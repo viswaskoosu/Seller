@@ -71,7 +71,7 @@ function SellerAccountPage() {
                   </div>
                   <p className="users-name">{user ? `${user.displayName}` : ""}</p>
                 </div>
-                <Link to="/seller-dashboard" className="accountPage_section">
+                <Link to="/seller-statistics" className="accountPage_section">
                   <div>
                   <div className="name-section">
                   <h3>Seller Statistics</h3>
