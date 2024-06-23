@@ -38,13 +38,13 @@ export const putReq = async (setIsLoading, url, data={}) => {
   return responseData
 }
 
-export const postReq = async (setIsLoading, url, data={}) => {
+export const postReq = async (setIsLoading, url, data={}, contentType='application/json') => {
   if (!localStorage.getItem('user')) throw new Error('Unauthorized')
   setIsLoading(true)
   let responseData = {}
    await axios.post(process.env.REACT_APP_API_URL+url, data, {
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': contentType,
         'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user')).token}`
       }
     })

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Chip, Box } from '@mui/material';
 
-const TagsInput = ({ newTag, setNewTag, handleInputChange, name, displayName }) => {
+const TagsInput = ({ newTag, setNewTag, handleInputChange, name, displayName,disableInput }) => {
   const [inputValue, setInputValue] = useState('');
 
   const handleInputChangeLocal = (event) => {
@@ -41,7 +41,7 @@ const TagsInput = ({ newTag, setNewTag, handleInputChange, name, displayName }) 
           />
         ))}
       </Box>
-      <textarea
+      {!disableInput? <textarea
         name="tags"
         value={inputValue}
         onChange={handleInputChangeLocal}
@@ -50,9 +50,33 @@ const TagsInput = ({ newTag, setNewTag, handleInputChange, name, displayName }) 
         style={{ resize: 'vertical' }}
         className="resize-textarea"
         placeholder={`Press Enter to add ${displayName}`}
-      />
+      />: <></>}
+      
     </div>
   );
 };
 
+export const ImageTagsInput = ({ newTag, setNewTag, handleInputChange, name, displayName, disableInput }) => {
+
+  const handleDelete = (fileToDelete) => () => {
+    const updatedTags = newTag.filter((tag) => tag !== fileToDelete);
+    setNewTag(updatedTags);
+  };
+
+  return (
+    <div className="form-group">
+      <label>{`${displayName}`}:</label>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 1 }}>
+        {newTag.map((file, index) => (
+          <Chip
+            key={index}
+            label={file.name}
+            onDelete={handleDelete(file)}
+            sx={{ m: 0.5 }}
+          />
+        ))}
+      </Box>
+    </div>
+  );
+};
 export default TagsInput;

@@ -1,26 +1,28 @@
 import React, { useState } from "react";
 import { useStateValue } from "../../Context/StateProvider";
 import { actionTypes } from "../../reducer";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import Categories from "../../Categories";
-import './AddProduct.css'; // Import CSS file for consistent styling
-import TagsInput from "../../components/TagsInput";
-import {postReq, displayError} from '../../Requests'
+import "./AddProduct.css"; // Import CSS file for consistent styling
+import TagsInput, {ImageTagsInput} from "../../components/TagsInput";
+import { postReq, displayError } from "../../Requests";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingPage from "../LoadingPage";
+import FileUpload from "../../components/FileUpload";
+import axios from 'axios'
 const AddProduct = () => {
   const [, dispatch] = useStateValue();
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [newProduct, setNewProduct] = useState({
-    title: '',
-    price: '',
-    mrp: '',
-    category: '',
-    customCategory: '',
-    description: '',
-    available: '',
+    title: "",
+    price: "",
+    mrp: "",
+    category: "",
+    customCategory: "",
+    description: "",
+    available: "",
     tags: [],
     keyFeatures: [],
     specifications: [],
@@ -47,7 +49,7 @@ const AddProduct = () => {
   const handleAddSpecification = () => {
     setNewProduct((prev) => ({
       ...prev,
-      specifications: [...prev.specifications, { key: '', value: '' }],
+      specifications: [...prev.specifications, { key: "", value: "" }],
     }));
   };
 
@@ -59,36 +61,103 @@ const AddProduct = () => {
   };
 
   const handleSave = () => {
-    // Convert specifications array to object
-    const specificationsObject = newProduct.specifications.reduce((acc, { key, value }) => {
-      acc[key] = value;
-      return acc;
-    }, {})
+    const specificationsObject = newProduct.specifications.reduce(
+      (acc, { key, value }) => {
+        acc[key] = value;
+        return acc;
+      },
+      {}
+    );
 
-    const category = newProduct.category === 'Other' ? newProduct.customCategory : newProduct.category;
-    console.log( { ...newProduct, category, specifications: specificationsObject, dateAdded: new Date().toISOString() })
-    const modifiedProduct = { ...newProduct, price: Number(newProduct.price), mrp: Number(newProduct.mrp), available: Number(newProduct.available), category, specifications: specificationsObject, dateAdded: new Date().toISOString() }
-    postReq(setIsLoading, '/product/editproduct?request=ADD', modifiedProduct)
-    .then(() => {
-      dispatch({
-        type: actionTypes.ADD_PRODUCT,
-        product: modifiedProduct ,
-      });
-    navigate('/your-products');
-    })
-    .catch((e) => {
-      displayError(e)
-    })
-      
+    const category =
+      newProduct.category === "Other"
+        ? newProduct.customCategory
+        : newProduct.category;
+    const formData = new FormData();
+    imageFiles.forEach((file) => {
+      formData.append("image", file);
+    });
+    // uploadFiles()
+
+    postReq(setIsLoading, `/product/uploadimages`, formData, 'multipart/form-data')
+      .then((responseData) => {
+        // console.log("Files uploaded successfully:", response.data);
+        const imageURLs = []
+        responseData.forEach(path => {
+          imageURLs.push(`${process.env.REACT_APP_API_URL}${path}`)
+        })
+        newProduct.images = imageURLs
+        const modifiedProduct = {
+          ...newProduct,
+          price: Number(newProduct.price),
+          mrp: Number(newProduct.mrp),
+          available: Number(newProduct.available),
+          category,
+          specifications: specificationsObject,
+          dateAdded: new Date().toISOString(),
+        };
+        postReq(setIsLoading, "/product/editproduct?request=ADD", modifiedProduct)
+          .then((responseData) => {
+            console.log(responseData)
+            dispatch({
+              type: actionTypes.ADD_PRODUCT,
+              product: responseData,
+            });
+            navigate("/your-products");
+          })
+          .catch((e) => {
+            displayError(e);
+          });
+      })
+      .catch((error) => {
+        toast.error("Error uploading files: "+ error);
+      })
+      .finally(() =>{console.log('hi')})
+    
   };
 
   const handleCancel = () => {
-    navigate('/your-products');
+    navigate("/your-products");
   };
   const [tags, setTags] = useState([]);
   const [keyFeatures, setKeyFeatures] = useState([]);
   const [images, setImages] = useState([]);
-  return (isLoading? <LoadingPage/>:
+  // const [imageNames, setImageNames] = useState([])
+  const [imageFiles, setImageFiles] = useState([]);
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files); 
+    const newImageNames = []
+    files.forEach(file => {
+      newImageNames.push(file.name)
+    })
+    // setImageNames([...imageNames, ...newImageNames])
+    setImageFiles([...imageFiles, ...files]);
+    // console.log(imageFiles)
+  };
+  // console.log(imageFiles)
+  const uploadFiles = () => {
+    const formData = new FormData();
+    imageFiles.forEach((file) => {
+      formData.append("image", file);
+    });
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/product/uploadimages`, formData)
+      .then((response) => {
+        // console.log("Files uploaded successfully:", response.data);
+        const imageURLs = []
+        response.data.forEach(path => {
+          imageURLs.push(`${process.env.REACT_APP_API_URL}${path}`)
+        })
+        setImages(imageURLs)
+      })
+      .catch((error) => {
+        toast.error("Error uploading files: "+ error);
+      })
+      .finally(() =>{console.log('hi')})
+  };
+  return isLoading ? (
+    <LoadingPage />
+  ) : (
     <div className="product-detail">
       <div className="product-detail-header">
         <h2>Add Product</h2>
@@ -136,7 +205,7 @@ const AddProduct = () => {
             ))}
             <option value="Other">Other</option>
           </select>
-          {newProduct.category === 'Other' && (
+          {newProduct.category === "Other" && (
             <input
               type="text"
               name="customCategory"
@@ -153,8 +222,8 @@ const AddProduct = () => {
             value={newProduct.description}
             onChange={handleInputChange}
             className="resize-textarea"
-            rows={Math.max(newProduct.description.split('\n').length, 1)}
-            style={{ resize: 'vertical' }}
+            rows={Math.max(newProduct.description.split("\n").length, 1)}
+            style={{ resize: "vertical" }}
           />
         </div>
         <div className="form-group">
@@ -184,8 +253,20 @@ const AddProduct = () => {
             className="resize-textarea"
           />
         </div> */}
-        <TagsInput newTag={tags} setNewTag={setTags} handleInputChange={handleInputChange} name='tags' displayName='Tags' />
-        <TagsInput newTag={keyFeatures} setNewTag={setKeyFeatures} handleInputChange={handleInputChange} name='keyFeatures' displayName='Key Features' />
+        <TagsInput
+          newTag={tags}
+          setNewTag={setTags}
+          handleInputChange={handleInputChange}
+          name="tags"
+          displayName="Tags"
+        />
+        <TagsInput
+          newTag={keyFeatures}
+          setNewTag={setKeyFeatures}
+          handleInputChange={handleInputChange}
+          name="keyFeatures"
+          displayName="Key Features"
+        />
         {/* <div className="form-group">
           <label>Key Features:</label>
           <textarea
@@ -227,7 +308,12 @@ const AddProduct = () => {
                   }
                   className="spec-input"
                 />
-                <button onClick={() => handleDeleteSpecification(index)} className="delete-spec-button">Delete</button>
+                <button
+                  onClick={() => handleDeleteSpecification(index)}
+                  className="delete-spec-button"
+                >
+                  Delete
+                </button>
               </div>
             ))}
             <button onClick={handleAddSpecification}>Add Specification</button>
@@ -251,9 +337,28 @@ const AddProduct = () => {
             className="resize-textarea"
           />
         </div> */}
-        <TagsInput newTag={images} setNewTag={setImages} handleInputChange={handleInputChange} name='images' displayName='Images' />
-        <button className="save-button" onClick={handleSave}>Save</button>
-        <button className="cancel-button" onClick={handleCancel}>Cancel</button>
+        {/* <TagsInput
+          newTag={imageNames}
+          setNewTag={setImageNames}
+          handleInputChange={handleInputChange}
+          name="images"
+          displayName="Images"
+          disableInput={true}
+        /> */}
+        <ImageTagsInput
+        newTag={imageFiles}
+        setNewTag={setImageFiles}
+        displayName="images"
+        />
+        <div>
+          <FileUpload handleFileUpload={handleFileUpload}/>
+        </div>
+        <button className="save-button" onClick={handleSave}>
+          Save
+        </button>
+        <button className="cancel-button" onClick={handleCancel}>
+          Cancel
+        </button>
       </div>
     </div>
   );
