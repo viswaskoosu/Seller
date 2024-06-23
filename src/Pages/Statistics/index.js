@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import dummySellingHistory from '../../dummySellingHistory'; // Adjust the path as per your file structure
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, ArcElement, Title, Tooltip, Legend, PointElement } from 'chart.js';
-import './Statistics.css'
+import './Statistics.css';
 import { Link } from 'react-router-dom';
+
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, ArcElement, Title, Tooltip, Legend, PointElement);
 
@@ -20,15 +21,18 @@ function Statistics() {
     }
   };
 
-  const handleCustomYearChange = (e) => {
-    const inputYear = e.target.value.trim();
-    if (/^\d{4}$/.test(inputYear) && parseInt(inputYear, 10) <= new Date().getFullYear()) {
-      setCustomYear(inputYear);
-    } else {
-      setCustomYear('');
-    }
+  const [enteredYear, setEnteredYear] = useState(null); // Track entered year
+  const handleCustomYearChange = (event) => {
+    const newYear = event.target.value.slice(0, 4); // Limit to 4 digits
+    setCustomYear(newYear);
   };
 
+  const handleEnterPress = (event) => {
+    if (event.key === 'Enter' && customYear.length === 4) {
+      setEnteredYear(customYear); // Store entered year
+
+    }
+  };
   useEffect(() => {
     const currentDate = new Date();
 
@@ -74,7 +78,7 @@ function Statistics() {
     };
 
     const filteredData = filterSalesData();
-    setFilteredSalesData(filteredData);
+    setFilteredSalesData(filteredData || []);
   }, [filter, customYear]);
 
   const getYearlyData = (yearsCount) => {
@@ -98,6 +102,7 @@ function Statistics() {
 
     return data;
   };
+
   const getMonthlyData = () => {
     const year = parseInt(customYear, 10);
     const months = Array.from({ length: 12 }, (_, index) => new Date(year, index, 1).toLocaleString('default', { month: 'short' }));
@@ -149,16 +154,16 @@ function Statistics() {
         <div className="chart">
           <h3>{`Sales Data for the Last ${yearsCount} Years`}</h3>
           <Bar
-          data={quantityData}
-          options={{
-            responsive: true,
-            scales: {
-              y: {
-                beginAtZero: true,
+            data={quantityData}
+            options={{
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
               },
-            },
-          }}
-        />
+            }}
+          />
           <Bar
             data={amountData}
             options={{
@@ -251,6 +256,7 @@ function Statistics() {
   const leastSoldProduct = productSales.reduce((min, product) => (product.totalQuantity < min.totalQuantity ? product : min), { totalQuantity: Infinity });
   const mostAmountSold = productSales.reduce((max, product) => (product.totalAmount > max.totalAmount ? product : max), { totalAmount: -Infinity });
   const leastAmountSold = productSales.reduce((min, product) => (product.totalAmount < min.totalAmount ? product : min), { totalAmount: Infinity });
+
   return (
     <div className="statistics">
       <div className="filter-section">
@@ -264,37 +270,37 @@ function Statistics() {
         </select>
         
         {filter === 'custom' && (
-          <input
-            type="text"
-            value={customYear}
-            onChange={handleCustomYearChange}
-            placeholder="Enter year (YYYY)"
-            maxLength="4"
-          />
-        )}
+      <div className="custom-year">
+      <input
+          type="number"
+          inputMode="numeric"
+          value={customYear}
+          onChange={handleCustomYearChange}
+          onKeyDown={handleEnterPress} 
+          placeholder="Enter year (YYYY)"
+          minLength={4}
+          maxLength={4}
+        />
       </div>
-      <div className="statistics-summary">
-        <h3>Sales Summary</h3>
-        {console.log(mostSoldProduct.id)}
-      <Link to={`/product/${mostSoldProduct.id}`}>
-        <p>Most Sold Product (Quantity): {mostSoldProduct.productTitle} ({mostSoldProduct.totalQuantity})</p>
-      </Link>
-
-      <Link to={`/product/${leastSoldProduct.id}`}>
-      <p>Least Sold Product (Quantity): {leastSoldProduct.productTitle} ({leastSoldProduct.totalQuantity})</p>
-      </Link>
-
-
-      <p>Most Amount Earned (Product): {mostAmountSold.productTitle} ( ₹{mostAmountSold.totalAmount})</p>
-      <Link to={`/product/${mostAmountSold.id}`}>
-      </Link>
-
-      <Link to={`/product/${leastAmountSold.id}`}>
-      <p>Least Amount Earned (Product): {leastAmountSold.productTitle} ( ₹{leastAmountSold.totalAmount})</p>
-      </Link>
+    )}
       </div>
+  <div className="statistics-summary">
+    <h3>Sales Summary</h3>
+        <Link to={`/product/${mostSoldProduct?.id}`}>
+          <p>Most Sold Product (Quantity): {mostSoldProduct?.productTitle} ({mostSoldProduct?.totalQuantity})</p>
+        </Link>
+        <Link to={`/product/${leastSoldProduct?.id}`}>
+          <p>Least Sold Product (Quantity): {leastSoldProduct?.productTitle} ({leastSoldProduct?.totalQuantity})</p>
+        </Link>
+        <Link to={`/product/${mostAmountSold?.id}`}>
+          <p>Most Amount Earned (Product): {mostAmountSold?.productTitle} (₹{mostAmountSold?.totalAmount})</p>
+        </Link>
+        <Link to={`/product/${leastAmountSold?.id}`}>
+          <p>Least Amount Earned (Product): {leastSoldProduct?.productTitle} (₹{leastAmountSold?.totalAmount})</p>
+        </Link>
+  </div>
+
       {renderChart()}
-
       <div className="pie-charts">
         <h3>Product Sales Distribution (Quantity)</h3>
         <Pie
@@ -310,7 +316,6 @@ function Statistics() {
             },
           }}
         />
-
         <h3>Product Sales Distribution (Amount)</h3>
         <Pie
           data={pieAmountData}
@@ -325,9 +330,7 @@ function Statistics() {
             },
           }}
         />
-      </div>
-
-
+      </div>)
     </div>
   );
 }

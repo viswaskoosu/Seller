@@ -19,6 +19,7 @@ import {ToastContainer} from 'react-toastify'
 import Statistics from "./Pages/Statistics";
 import ContactInfo from './Pages/ContactInfo'
 import {getReq} from './Requests'
+import SearchResults from "./Pages/SearchResults";
 function App() {
   const [{ user }, dispatch] = useStateValue();
   const [isLoading, setIsLoading] = useState(true);
@@ -92,6 +93,8 @@ function App() {
         <Route path="/seller-addresses" element={<Addresses />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/seller-contact-info" element={<ContactInfo />} />
+        <Route path="/search-results/:query" element={<SearchResults />} /> {/* New Route for SearchResults */}
+
         <Route path="*" element={<ErrorPage />} />
 
       </Routes>
