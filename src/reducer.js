@@ -54,7 +54,10 @@ const reducer = (state, action) => {
     case actionTypes.USER_LOGOUT:
       return {
         ...state,
-        userLoggedIn: false,
+        user: {},
+  products: [],
+  sellingHistory: [],
+  userLoggedIn: false
       }
     case actionTypes.EDIT_ADDRESS:
       localStorage.setItem(
