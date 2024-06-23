@@ -17,6 +17,7 @@ import ProductDetailInfo from "./Pages/ProductDetailInfo";
 import SignIn from "./Pages/SignIn";
 import {ToastContainer} from 'react-toastify'
 import Statistics from "./Pages/Statistics";
+import ContactInfo from './Pages/ContactInfo'
 import {getReq} from './Requests'
 function App() {
   const [{ user }, dispatch] = useStateValue();
@@ -90,7 +91,9 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/seller-addresses" element={<Addresses />} />
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/seller-contact-info" element={<ContactInfo />} />
         <Route path="*" element={<ErrorPage />} />
+
       </Routes>
       <ToastContainer/>
 

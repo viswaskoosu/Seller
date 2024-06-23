@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import "./Addresses.css"; // Ensure this CSS file is in the correct path
 import { useStateValue } from "../../Context/StateProvider";
-import Header from "../../components/Header";
-
+// import Header from "../../Components/Header";
+import {postReq} from '../../Requests'
+import LoadingPage from '../LoadingPage'
+import 'react-toastify/dist/ReactToastify.css'
+import {toast} from 'react-toastify'
 const countries = [
   "India",
   "United States",
@@ -19,6 +22,7 @@ const countries = [
 
 function Addresses() {
   const [{ user, userLoggedIn }, dispatch] = useStateValue();
+  console.log(userLoggedIn)
   const [editMode, setEditMode] = useState(false);
   const [currentAddress, setCurrentAddress] = useState(null);
   const [newAddress, setNewAddress] = useState({
@@ -32,7 +36,7 @@ function Addresses() {
   const [errors, setErrors] = useState({});
   const [pinTimeout, setPinTimeout] = useState(null);
   const [manualCountry, setManualCountry] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
   const validate = () => {
     let validationErrors = {};
     if (!newAddress.name) validationErrors.name = "Name is required";
@@ -78,13 +82,25 @@ function Addresses() {
     setNewAddress({ ...address });
   };
 
-  const handleDelete = (addressId) => {
-    // Remove address logic here
-    dispatch({
-      type: "DELETE_ADDRESS",
-      addressId: addressId,
-    });
-  };
+  // const handleDelete = (addressId) => {
+  //   // const updatedAddresses = user.addresses.filter((a) => a.id !== addressId);
+  //   postReq(setIsLoading, `/user/editaddress?request=delete&id=${addressId}`)
+  //     .then(() => {
+  //       dispatch({
+  //         type: "DELETE_ADDRESS",
+  //         addressId: addressId,
+  //       });
+  //       toast.success('Deleted successfully')
+  //     })
+  //     .catch((error) => {
+  //       if (error.response && error.response.data && error.response.data.error){
+  //         toast.error(error.response.data.error)
+  //       }else{
+  //         toast.error("Error contacting server")
+  //       }
+  //     })
+    
+  // };
 
   const handleSave = () => {
     const validationErrors = validate();
@@ -94,32 +110,71 @@ function Addresses() {
     }
 
     if (currentAddress) {
-      // Update address logic here
-      dispatch({
-        type: "EDIT_ADDRESS",
-        address: { ...newAddress, id: currentAddress.id },
-      });
+      const addressObject = {address: newAddress}
+      // console.log(currentAddress.id, newAddress.id)
+      postReq(setIsLoading, '/user/editaddress?request=update', addressObject)
+      .then(() => {
+        dispatch({
+          type: "EDIT_ADDRESS",
+          address: { ...newAddress, id: currentAddress.id },//both ids are same.
+        });
+        toast.success('Edited successfully')
+      })
+      .catch((error) => {
+        if (error.response && error.response.data && error.response.data.error){
+          toast.error(error.response.data.error)
+        }else{
+          toast.error("Error contacting server")
+        }
+      })
+      .finally(() => {
+        setEditMode(false);
+        setCurrentAddress({...newAddress}) // doubt in this line... (nithin added)
+        setNewAddress({
+          name: "",
+          street: "",
+          city: "",
+          state: "",
+          zip: "",
+          country: "India",
+        });
+        setErrors({});
+        setManualCountry(false);
+      })    
     } else {
       const newAddressWithId = { ...newAddress, id: Date.now().toString() };
-      // Add address logic here
-      dispatch({
-        type: "ADD_ADDRESS",
-        address: newAddressWithId,
-      });
-    }
+      const addressObject = {address: newAddressWithId}
 
-    setEditMode(false);
-    setCurrentAddress(null);
-    setNewAddress({
-      name: "",
-      street: "",
-      city: "",
-      state: "",
-      zip: "",
-      country: "India",
-    });
-    setErrors({});
-    setManualCountry(false);
+      postReq(setIsLoading, '/user/editaddress?request=add', addressObject)
+      .then(() => {
+        dispatch({
+          type: "ADD_ADDRESS",
+          address: newAddressWithId,
+        });
+        toast.success('Added successfully')
+      })
+      .catch((error) => {
+        if (error.response && error.response.data && error.response.data.error){
+          toast.error(error.response.data.error)
+        }else{
+          toast.error("Error contacting server")
+        }
+      })
+      .finally(() => {
+        setEditMode(false);
+        setCurrentAddress({...newAddress})
+        setNewAddress({
+          name: "",
+          street: "",
+          city: "",
+          state: "",
+          zip: "",
+          country: "India",
+        });
+        setErrors({});
+        setManualCountry(false);
+      })    
+    }  
   };
 
   const handlePinChange = (e) => {
@@ -151,13 +206,15 @@ function Addresses() {
     setErrors((prevErrors) => ({ ...prevErrors, country: "" }));
   };
 
-  return (
+  return !userLoggedIn ? (
+    <div>404 not found</div>
+  ) : (
     <>
       {/* <Header /> */}
       <div className="addresses">
         <div className="header">
-          <h1>Manage Your Addresses</h1>
-          <button
+          <h2>Manage Your Store Address</h2>
+          {/* <button
             className="add_address"
             onClick={() => {
               setEditMode(true);
@@ -173,7 +230,13 @@ function Addresses() {
             }}
           >
             Add New Address
-          </button>
+          </button> */}
+          <button
+                    className="add_address"
+                    onClick={() => handleEdit(user.addresses[0])}
+                  >
+                    Edit
+                  </button>
         </div>
 
         {editMode ? (
@@ -265,7 +328,7 @@ function Addresses() {
                     {address.city}, {address.state} {address.zip}
                   </p>
                   <p>{address.country}</p>
-                  <button
+                  {/* <button
                     className="edit_button"
                     onClick={() => handleEdit(address)}
                   >
@@ -276,7 +339,7 @@ function Addresses() {
                     onClick={() => handleDelete(address.id)}
                   >
                     Delete
-                  </button>
+                  </button> */}
                 </div>
               ))
             ) : (

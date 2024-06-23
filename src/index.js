@@ -11,7 +11,7 @@ ReactDOM.render(
         user: user,
         products: [], 
         sellingHistory: [],
-        userLoggedIn: false
+        userLoggedIn: localStorage.getItem('user')? true: false,
     }} reducer={reducer}>
       <App />
       </StateProvider>

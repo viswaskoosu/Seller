@@ -14,6 +14,7 @@ export const actionTypes = {
   SET_PRODUCTS: 'SET_PRODUCTS',
   USER_LOGIN: 'USER_LOGIN',
   USER_LOGOUT: 'USER_LOGOUT',
+  EDIT_ADDRESS: 'EDIT_ADDRESS',
 };
 
 const reducer = (state, action) => {
@@ -55,6 +56,22 @@ const reducer = (state, action) => {
         ...state,
         userLoggedIn: false,
       }
+    case actionTypes.EDIT_ADDRESS:
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...state.user,
+          addresses: [action.address],
+        })
+      );
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          addresses: [action.address],
+        },
+      };
+    
     default:
       return state;
   }

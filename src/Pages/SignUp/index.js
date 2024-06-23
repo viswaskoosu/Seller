@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { useParams, useNavigate,  Link as RouterLink } from "react-router-dom";
+import { useParams, useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Box,
   Button,
@@ -17,20 +17,28 @@ import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
 import { useLocation } from "react-router-dom";
 import LoadingPage from "../LoadingPage";
-import {toast} from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useStateValue } from "../../Context/StateProvider";
-import axios from 'axios'
+import axios from "axios";
+import AddressTemplate from "./AddressTemplate";
 const SignUp = () => {
   const navigate = useNavigate();
-  const [,dispatch] = useStateValue()
-  const [isLoading, setIsLoading] = useState(false)
+  const [, dispatch] = useStateValue();
+  const [isLoading, setIsLoading] = useState(false);
   const [stage, setStage] = useState(0);
   const [progress, setProgress] = useState(25);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [productCategory, setProductCategory] = useState("");
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState({
+    name: "",
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "India",
+  });
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -42,6 +50,7 @@ const SignUp = () => {
   const [phoneNumberError, setPhoneNumberError] = useState(false);
   const [addressError, setAddressError] = useState(false);
   const [businessNameError, setBusinessNameError] = useState(false);
+
   const handleChange = (e) => {
     if (e.target.id === "email") {
       setEmail(e.target.value);
@@ -63,10 +72,10 @@ const SignUp = () => {
       setPhoneNumber(e.target.value);
       setPhoneNumberError(false);
     }
-    if (e.target.id === "address") {
-      setAddress(e.target.value);
-      setAddressError(false);
-    }
+    // if (e.target.id === "address") {
+    //   setAddress(e.target.value);
+    //   setAddressError(false);
+    // }
     if (e.target.id === "businessName") {
       setBusinessName(e.target.value);
       setBusinessNameError(false);
@@ -118,42 +127,53 @@ const SignUp = () => {
       } else {
         setBusinessNameError(false);
       }
-      if (address.length === 0) {
+      if (
+        // address.name === "" ||
+        address.street === "" ||
+        address.city === "" ||
+        address.state === "" ||
+        address.zip === "" ||
+        address.country === ""
+      ) {
         check = check || true;
-        setAddressError("Invalid Address");
-      } else {
-        setAddressError(false);
+        const validationErrors = validate();
+        if (Object.keys(validationErrors).length > 0) {
+          setAddressErrors(validationErrors);
+        } else {
+          setAddressErrors(false);
+        }
       }
     }
     return check;
   };
   const handleSubmit = async () => {
+    const modifiedAddress = {...address, id: Date.now(), name: businessName}
     const userData = {
       name: `${firstName} ${lastName}`,
       email: email,
       password: password,
-      address: address,
+      address: modifiedAddress,
       phone: phoneNumber,
       businessName: businessName,
       isSeller: true,
     };
-    setIsLoading(true)
+    setIsLoading(true);
     await axios
       .post(`${process.env.REACT_APP_API_URL}/user/signup`, userData)
       .then((response) => {
         // console.log(response.data)
         // if (response.data.success)
-          // Cookies.set("token", response.data.token)
-          console.log(response.data.user)
+        // Cookies.set("token", response.data.token)
+        console.log(response.data.user);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         toast.success("Signed up successfully");
         dispatch({
           type: "USER_LOGIN",
         });
         dispatch({
-          type: 'SET_USER',
-          user: response.data.user
-        })
+          type: "SET_USER",
+          user: response.data.user,
+        });
         navigate("/");
       })
       .catch((error) => {
@@ -166,10 +186,9 @@ const SignUp = () => {
         } else toast.error("Couldn't sign up (Server error)");
       })
       .finally(() => {
-        setIsLoading(false)
+        setIsLoading(false);
       });
-
-  }
+  };
   const handleNextStage = () => {
     if (checkForm()) return;
     setStage(stage + 1);
@@ -180,8 +199,103 @@ const SignUp = () => {
     setStage(stage - 1);
     setProgress(progress - 25);
   };
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleNextStage();
+    }
+  };
+  const [addressErrors, setAddressErrors] = useState({});
+  const [pinTimeout, setPinTimeout] = useState(null);
+  const [manualCountry, setManualCountry] = useState(false);
+  const countries = [
+    "India",
+    "United States",
+    "Canada",
+    "Australia",
+    "United Kingdom",
+    "Germany",
+    "France",
+    "Japan",
+    "China",
+    "Brazil",
+    "South Africa",
+  ];
+
+  const validate = () => {
+    let validationErrors = {};
+    // if (!address.name) validationErrors.name = "Name is required";
+    if (!address.street) validationErrors.street = "Street is required";
+    if (!address.city) validationErrors.city = "City is required";
+    if (!address.state) validationErrors.state = "State is required";
+    if (!address.zip.match(/^\d{6}$/))
+      validationErrors.zip = "Invalid PIN code";
+    if (!address.country && !manualCountry)
+      validationErrors.country = "Country is required";
+    return validationErrors;
+  };
+  const fetchCityState = async (pin) => {
+    try {
+      const response = await fetch(
+        `https://api.postalpincode.in/pincode/${pin}`
+      );
+      const data = await response.json();
+      if (data[0].Status === "Success") {
+        const { District, State } = data[0].PostOffice[0];
+        setAddress((prevState) => ({
+          ...prevState,
+          city: District,
+          state: State,
+        }));
+        setAddressErrors((prevErrors) => ({ ...prevErrors, zip: "" }));
+      } else {
+        setAddressErrors((prevErrors) => ({
+          ...prevErrors,
+          zip: "Invalid PIN code",
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching city and state:", error);
+      setAddressErrors((prevErrors) => ({
+        ...prevErrors,
+        zip: "Error fetching data",
+      }));
+    }
+  };
+
+  const handlePinChange = (e) => {
+    const value = e.target.value;
+
+    if (value.match(/^\d{0,6}$/)) {
+      setAddress({ ...address, zip: value });
+
+      if (value.length === 6) {
+        if (pinTimeout) {
+          clearTimeout(pinTimeout);
+        }
+        setPinTimeout(setTimeout(() => fetchCityState(value), 500));
+      } else {
+        setAddressErrors((prevErrors) => ({
+          ...prevErrors,
+          zip: "Invalid PIN code",
+        }));
+      }
+    }
+  };
+  const handleCountryChange = (e) => {
+    const value = e.target.value;
+    if (value === "Manual") {
+      setManualCountry(true);
+      setAddress({ ...address, country: "" });
+    } else {
+      setManualCountry(false);
+      setAddress({ ...address, country: value });
+    }
+    setAddressErrors((prevErrors) => ({ ...prevErrors, country: "" }));
+  };
   // console.log(email, password, firstName, lastName)
-  return (isLoading? <LoadingPage/>:
+  return isLoading ? (
+    <LoadingPage />
+  ) : (
     <Container maxWidth="md">
       <Box sx={{ width: "100%", mt: 4 }}>
         <LinearProgress variant="determinate" value={progress} />
@@ -206,6 +320,7 @@ const SignUp = () => {
                   helperText={firstNameError}
                   value={firstName}
                   onChange={handleChange}
+                  onKeyDown={handleKeyDown}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -220,6 +335,7 @@ const SignUp = () => {
                   helperText={lastNameError}
                   value={lastName}
                   onChange={handleChange}
+                  onKeyDown={handleKeyDown}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -237,6 +353,7 @@ const SignUp = () => {
                   helperText={emailError}
                   value={email}
                   onChange={handleChange}
+                  onKeyDown={handleKeyDown}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -252,6 +369,7 @@ const SignUp = () => {
                   helperText={passwordError}
                   value={password}
                   onChange={handleChange}
+                  onKeyDown={handleKeyDown}
                 />
               </Grid>
             </Grid>
@@ -277,6 +395,7 @@ const SignUp = () => {
               error={phoneNumberError}
               helperText={phoneNumberError}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
             />
             <Box
               sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}
@@ -304,6 +423,7 @@ const SignUp = () => {
               error={businessNameError}
               helperText={businessNameError}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               sx={{ mb: 2 }}
             />
             <Button variant="contained" sx={{ mb: 2 }}>
@@ -324,7 +444,7 @@ const SignUp = () => {
                 <MenuItem value="Category3">Category 3</MenuItem>
               </Select>
             </FormControl> */}
-            <TextField
+            {/* <TextField
               fullWidth
               label="Business Address"
               variant="outlined"
@@ -333,8 +453,109 @@ const SignUp = () => {
               error={addressError}
               helperText={addressError}
               onChange={handleChange}
+onKeyDown={handleKeyDown}
               sx={{ mb: 2 }}
-            />
+            /> */}
+            {/* <AddressTemplate address={address} setAddress={setAddress} handleKeyDown={handleKeyDown} /> */}
+            <div className="address_form">
+              {/* <input
+                type="text"
+                placeholder="Name"
+                value={address.name}
+                onChange={(e) => {
+                  setAddress({ ...address, name: e.target.value });
+                  setAddressErrors({ ...addressErrors, name: false });
+                }}
+                onKeyDown={handleKeyDown}
+              />
+              {addressErrors.name && (
+                <span className="error">{addressErrors.name}</span>
+              )} */}
+              <input
+                type="text"
+                placeholder="Street"
+                value={address.street}
+                onChange={(e) => {
+                  setAddress({ ...address, street: e.target.value });
+                  setAddressErrors({ ...addressErrors, street: false });
+                }}
+                onKeyDown={handleKeyDown}
+              />
+              {addressErrors.street && (
+                <span className="error">{addressErrors.street}</span>
+              )}
+              <input
+                type="text"
+                placeholder="City"
+                value={address.city}
+                onChange={(e) => {
+                  setAddress({ ...address, city: e.target.value });
+                  setAddressErrors({ ...addressErrors, city: false });
+                }}
+                onKeyDown={handleKeyDown}
+              />
+              {addressErrors.city && (
+                <span className="error">{addressErrors.city}</span>
+              )}
+              <input
+                type="text"
+                placeholder="State"
+                value={address.state}
+                onChange={(e) => {
+                  setAddress({ ...address, state: e.target.value });
+                  setAddressErrors({ ...addressErrors, state: false });
+                }}
+                onKeyDown={handleKeyDown}
+              />
+              {addressErrors.state && (
+                <span className="error">{addressErrors.state}</span>
+              )}
+              <input
+                type="text"
+                placeholder="PIN Code"
+                value={address.zip}
+                onChange={handlePinChange}
+              />
+              {addressErrors.zip && (
+                <span className="error">{addressErrors.zip}</span>
+              )}
+              <select
+                value={manualCountry ? "Manual" : address.country}
+                onChange={handleCountryChange}
+              >
+                <option value="">Select Country</option>
+                {countries.map((country) => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
+                <option value="Manual">Enter Manually</option>
+              </select>
+              {manualCountry && (
+                <input
+                  type="text"
+                  placeholder="Country"
+                  value={address.country}
+                  onChange={(e) => {
+                    setAddress({ ...address, country: e.target.value });
+                    setAddressErrors({ ...addressErrors, country: false });
+                  }}
+                  onKeyDown={handleKeyDown}
+                />
+              )}
+              {addressErrors.country && (
+                <span className="error">{addressErrors.country}</span>
+              )}
+              {/* <button className="save_button" onClick={handleSave}>
+              Save
+            </button> */}
+              {/* <button
+              className="cancel_button"
+              onClick={() => setEditMode(false)}
+            >
+              Cancel
+            </button> */}
+            </div>
             <Box
               sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}
             >
@@ -371,7 +592,7 @@ const SignUp = () => {
               Product Category: {productCategory}
             </Typography> */}
             <Typography variant="body1" gutterBottom>
-              Business Address: {address}
+              Business Address: {address.street}, {address.city}, {address.state}, {address.country}, {address.zip}
             </Typography>
             <Box
               sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}
@@ -379,7 +600,11 @@ const SignUp = () => {
               <Button variant="contained" onClick={handlePreviousStage}>
                 Back
               </Button>
-              <Button variant="contained" color="primary" onClick={handleSubmit}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+              >
                 Submit
               </Button>
             </Box>
@@ -387,10 +612,10 @@ const SignUp = () => {
         )}
       </Box>
       <Grid item>
-                    <RouterLink to="/signin" component={Link} variant="body2">
-                      {"Already have an account? Signin"}
-                    </RouterLink>
-                  </Grid>
+        <RouterLink to="/signin" component={Link} variant="body2">
+          {"Already have an account? Signin"}
+        </RouterLink>
+      </Grid>
     </Container>
   );
 };
