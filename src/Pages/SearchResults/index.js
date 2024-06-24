@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import './SearchResults.css';
 import Header from '../../components/Header';
 import CategoryProduct from '../../components/SellerProduct';
 import { useStateValue } from '../../Context/StateProvider';
+import debounce from 'lodash/debounce'; // Import lodash debounce here
 
 const SearchResults = () => {
   const { query } = useParams();
@@ -16,6 +17,24 @@ const SearchResults = () => {
     price: [0, 0],
   });
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  // Define debouncedFilterChange here
+  const debouncedFilterChange = useCallback(
+    debounce((filterType, value) => {
+      setFilters((prevFilters) => {
+        if (filterType === 'discount') {
+          const updatedDiscounts = prevFilters.discount.includes(value)
+            ? prevFilters.discount.filter((discount) => discount !== value)
+            : [...prevFilters.discount, value];
+          return { ...prevFilters, discount: updatedDiscounts };
+        } else if (filterType === 'price') {
+          return { ...prevFilters, price: [prevFilters.price[0], value] };
+        }
+        return prevFilters;
+      });
+    }, 300),
+    []
+  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -35,14 +54,17 @@ const SearchResults = () => {
     const searchProducts = () => {
       let filtered = ProductsData.filter((product) =>
         product.title.toLowerCase().includes(query.toLowerCase()) ||
-        product.category.toLowerCase().includes(query.toLowerCase() ||
-        product.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
-      )
+        product.category.toLowerCase().includes(query.toLowerCase()) ||
+        product.tags.some((tag) => tag.toLowerCase().includes(query.toLowerCase()))
       );
 
       const maxPrice = calculateMaxPrice(filtered);
       setMaxPrice(maxPrice);
-      setFilters((prevFilters) => ({ ...prevFilters, price: [0, maxPrice] }));
+
+      // Update filters only if they are not already set
+      if (filters.price[1] === 0) {
+        setFilters((prevFilters) => ({ ...prevFilters, price: [0, maxPrice] }));
+      }
 
       // Apply filters
       if (filters.discount.length > 0) {
@@ -81,29 +103,20 @@ const SearchResults = () => {
       const uniqueFilteredProducts = filtered.filter((product, index, self) =>
         index === self.findIndex((p) => p.id === product.id)
       );
-    
+
       setFilteredProducts(uniqueFilteredProducts);
     };
 
     searchProducts();
   }, [query, ProductsData, sortBy, filters]);
 
-  const handleSortChange = (option) => {
+  const handleSortChange = useCallback((option) => {
     setSortBy(option);
-  };
+  }, []);
 
-  const handleFilterChange = (filterType, value) => {
-    let newFilters = { ...filters };
-    if (filterType === 'discount') {
-      const updatedDiscounts = newFilters.discount.includes(value)
-        ? newFilters.discount.filter((discount) => discount !== value)
-        : [...newFilters.discount, value];
-      newFilters.discount = updatedDiscounts;
-    } else if (filterType === 'price') {
-      newFilters.price = value;
-    }
-    setFilters(newFilters);
-  };
+  const handleFilterChange = useCallback((filterType, value) => {
+    debouncedFilterChange(filterType, value); // Use debouncedFilterChange here
+  }, [debouncedFilterChange]);
 
   const getDiscountPercentage = (price, mrp) => {
     const discount = ((mrp - price) / mrp) * 100;
@@ -113,38 +126,84 @@ const SearchResults = () => {
   return (
     <div className='category-page'>
       {/* <Header /> */}
-      <div className="category-container">
+      <div className='category-container'>
         {isMobile ? (
-          <div className="mobile-filters">
-            <select className="sort_by_buttons" value={sortBy} onChange={(e) => handleSortChange(e.target.value)}>
-              <option value="rating-high" className={`${sortBy === 'rating-high' ? 'active' : ''}`}>Highest Rating</option>
-              <option value="price-high" className={`${sortBy === 'price-high' ? 'active' : ''}`}>Price High to Low</option>
-              <option value="price-low" className={`${sortBy === 'price-low' ? 'active' : ''}`}>Price Low to High</option>
-              <option value="reviews-high" className={`${sortBy === 'reviews-high' ? 'active' : ''}`}>Most Reviews</option>
-              <option value="reviews-low" className={`${sortBy === 'reviews-low' ? 'active' : ''}`}>Least Reviews</option>
-              <option value="discount-high" className={`${sortBy === 'discount-high' ? 'active' : ''}`}>Discount High to Low</option>
-              <option value="discount-low" className={`${sortBy === 'discount-low' ? 'active' : ''}`}>Discount Low to High</option>
+          <div className='mobile-filters'>
+            <select
+              className='sort_by_buttons'
+              value={sortBy}
+              onChange={(e) => handleSortChange(e.target.value)}
+            >
+              <option value='rating-high' className={`${sortBy === 'rating-high' ? 'active' : ''}`}>
+                Highest Rating
+              </option>
+              <option value='price-high' className={`${sortBy === 'price-high' ? 'active' : ''}`}>
+                Price High to Low
+              </option>
+              <option value='price-low' className={`${sortBy === 'price-low' ? 'active' : ''}`}>
+                Price Low to High
+              </option>
+              <option value='reviews-high' className={`${sortBy === 'reviews-high' ? 'active' : ''}`}>
+                Most Reviews
+              </option>
+              <option value='reviews-low' className={`${sortBy === 'reviews-low' ? 'active' : ''}`}>
+                Least Reviews
+              </option>
+              <option value='discount-high' className={`${sortBy === 'discount-high' ? 'active' : ''}`}>
+                Discount High to Low
+              </option>
+              <option value='discount-low' className={`${sortBy === 'discount-low' ? 'active' : ''}`}>
+                Discount Low to High
+              </option>
             </select>
             <select onChange={(e) => handleFilterChange('discount', parseInt(e.target.value))}>
-              <option value="">Filter by Discount</option>
-              <option value="10">10% or more</option>
-              <option value="20">20% or more</option>
-              <option value="30">30% or more</option>
-              <option value="40">40% or more</option>
+              <option value=''>Filter by Discount</option>
+              <option value='10'>10% or more</option>
+              <option value='20'>20% or more</option>
+              <option value='30'>30% or more</option>
+              <option value='40'>40% or more</option>
             </select>
           </div>
         ) : (
-          <div className="filters">
+          <div className='filters'>
             <div>
               <h3>Sort By</h3>
-              <ul className="sort_by_buttons">
-                <li><button className={`${sortBy === 'rating-high' ? 'active' : ''}`} onClick={() => setSortBy('rating-high')}>Highest Rating</button></li>
-                <li><button className={`${sortBy === 'price-high' ? 'active' : ''}`} onClick={() => setSortBy('price-high')}>Price High to Low</button></li>
-                <li><button className={`${sortBy === 'price-low' ? 'active' : ''}`} onClick={() => setSortBy('price-low')}>Price Low to High</button></li>
-                <li><button className={`${sortBy === 'reviews-high' ? 'active' : ''}`} onClick={() => setSortBy('reviews-high')}>Most Reviews</button></li>
-                <li><button className={`${sortBy === 'reviews-low' ? 'active' : ''}`} onClick={() => setSortBy('reviews-low')}>Least Reviews</button></li>
-                <li><button className={`${sortBy === 'discount-high' ? 'active' : ''}`} onClick={() => setSortBy('discount-high')}>Discount High to Low</button></li>
-                <li><button className={`${sortBy === 'discount-low' ? 'active' : ''}`} onClick={() => setSortBy('discount-low')}>Discount Low to High</button></li>
+              <ul className='sort_by_buttons'>
+                <li>
+                  <button className={`${sortBy === 'rating-high' ? 'active' : ''}`} onClick={() => handleSortChange('rating-high')}>
+                    Highest Rating
+                  </button>
+                </li>
+                <li>
+                  <button className={`${sortBy === 'price-high' ? 'active' : ''}`} onClick={() => handleSortChange('price-high')}>
+                    Price High to Low
+                  </button>
+                </li>
+                <li>
+                  <button className={`${sortBy === 'price-low' ? 'active' : ''}`} onClick={() => handleSortChange('price-low')}>
+                    Price Low to High
+                  </button>
+                </li>
+                <li>
+                  <button className={`${sortBy === 'reviews-high' ? 'active' : ''}`} onClick={() => handleSortChange('reviews-high')}>
+                    Most Reviews
+                  </button>
+                </li>
+                <li>
+                  <button className={`${sortBy === 'reviews-low' ? 'active' : ''}`} onClick={() => handleSortChange('reviews-low')}>
+                    Least Reviews
+                  </button>
+                </li>
+                <li>
+                  <button className={`${sortBy === 'discount-high' ? 'active' : ''}`} onClick={() => handleSortChange('discount-high')}>
+                    Discount High to Low
+                  </button>
+                </li>
+                <li>
+                  <button className={`${sortBy === 'discount-low' ? 'active' : ''}`} onClick={() => handleSortChange('discount-low')}>
+                    Discount Low to High
+                  </button>
+                </li>
               </ul>
             </div>
             <div>
@@ -152,33 +211,54 @@ const SearchResults = () => {
               <ul>
                 <li>
                   <label>
-                    <input type="checkbox" onChange={() => handleFilterChange('discount', 10)} checked={filters.discount.includes(10)} /> 10% or more
+                    <input
+                      type='checkbox'
+                      onChange={() => handleFilterChange('discount', 10)}
+                      checked={filters.discount.includes(10)}
+                    />{' '}
+                    10% or more
                   </label>
                 </li>
                 <li>
                   <label>
-                    <input type="checkbox" onChange={() => handleFilterChange('discount', 20)} checked={filters.discount.includes(20)} /> 20% or more
+                    <input
+                      type='checkbox'
+                      onChange={() => handleFilterChange('discount', 20)}
+                      checked={filters.discount.includes(20)}
+                    />{' '}
+                    20% or more
                   </label>
                 </li>
                 <li>
                   <label>
-                    <input type="checkbox" onChange={() => handleFilterChange('discount', 30)} checked={filters.discount.includes(30)} /> 30% or more
+                    <input
+                      type='checkbox'
+                      onChange={() => handleFilterChange('discount', 30)}
+                      checked={filters.discount.includes(30)}
+                    />{' '}
+                    30% or more
                   </label>
                 </li>
                 <li>
                   <label>
-                    <input type="checkbox" onChange={() => handleFilterChange('discount', 40)} checked={filters.discount.includes(40)} /> 40% or more
+                    <input
+                      type='checkbox'
+                      onChange={() => handleFilterChange('discount', 40)}
+                      checked={filters.discount.includes(40)}
+                    />{' '}
+                    40% or more
                   </label>
                 </li>
                 <li>
                   <label>
                     Price up to {filters.price[1]}
+                    <br></br>
                     <input
-                      type="range"
-                      min="0"
+                      type='range'
+                      min='0'
                       max={maxPrice}
                       value={filters.price[1]}
-                      onChange={(e) => handleFilterChange('price', [0, parseInt(e.target.value)])}
+                      onChange={(e) => handleFilterChange('price', parseInt(e.target.value))}
                     />
                   </label>
                 </li>
@@ -186,7 +266,7 @@ const SearchResults = () => {
             </div>
           </div>
         )}
-        <div className="product-list">
+        <div className='product-list'>
           <h2>Search Results for "{query}"</h2>
           <div className='each_card'>
             {filteredProducts.length > 0 ? (
