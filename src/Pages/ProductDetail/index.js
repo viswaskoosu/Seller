@@ -30,23 +30,37 @@ const ProductDetail = () => {
     product ? product.keyFeatures : []
   );
   const [images, setImages] = useState(product ? product.images : []);
-  // const [imageNames, setImageNames] = useState(
-  //   product
-  //     ? product.images.map((url) => {
-  //         const pathname = new URL(url).pathname;
-  //         return pathname.substring(pathname.lastIndexOf("/") + 1);
-  //       })
-  //     : []
-  // );
-  const [imageFiles, setImageFiles] = useState(product? product.images.map((url) => {
-    const pathname = new URL(url).pathname;
-    return {name: pathname.substring(pathname.lastIndexOf("/") + 1)}
-  }):[]);
+  const [imageNames, setImageNames] = useState(
+    product
+      ? product.images.map((url) => {
+          const pathname = new URL(url).pathname;
+          return pathname.substring(pathname.lastIndexOf("/") + 1);
+        })
+      : []
+  );
+  const [imageFiles, setImageFiles] = useState(
+    product
+      ? product.images.map((url) => {
+          const pathname = new URL(url).pathname;
+          return { name: pathname.substring(pathname.lastIndexOf("/") + 1) };
+        })
+      :
+       []
+  );
+  useEffect(() => {
+    if (product?.images.length===0){
+      setImages(product.images)
+    }
+    if  (imageFiles?.length===0){
+      setImageFiles(product?.images.map((url) => {
+        const pathname = new URL(url).pathname;
+        return { name: pathname.substring(pathname.lastIndexOf("/") + 1) };
+      }))
+    }
+  }, [products])
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
-    // setImageNames([...imageNames, ...newImageNames])
     setImageFiles([...imageFiles, ...files]);
-    // console.log(imageFiles)
   };
   useEffect(() => {
     if (product) {
@@ -108,26 +122,65 @@ const ProductDetail = () => {
       },
       {}
     );
-    // const filteredImages = 
+    const formData = new FormData();
+    imageFiles.forEach((file) => {
+      if (
+        file instanceof File
+        // file.hasOwnProperty("name") &&
+        // file.hasOwnProperty("size") &&
+        // file.hasOwnProperty("type")
+      ) {
+        formData.append("image", file);
+      }
+    });
+    formData.append("productId", productId)
+    // const filteredImages =
     const modifiedProduct = {
       ...updatedProduct,
       specifications: specificationsObject,
     };
     postReq(
       setIsLoading,
-      "/product/editproduct?request=UPDATE",
-      modifiedProduct
+      `/product/uploadimages?id=${productId}`,
+      formData,
+      "multipart/form-data"
     )
-      .then(() => {
-        dispatch({
-          type: actionTypes.UPDATE_PRODUCT,
-          product: modifiedProduct,
+      .then((responseData) => {
+        // console.log("Files uploaded successfully:", response.data);
+        const oldImageURLs = images;
+        const imageURLs = oldImageURLs.filter(url => imageFiles.some(file => {
+          const pathname = new URL(url).pathname;
+          return (file.name===pathname.substring(pathname.lastIndexOf("/") + 1) );
+          }))
+        console.log(responseData)
+        responseData.forEach((path) => {
+          imageURLs.push(`${process.env.REACT_APP_API_URL}${path}`);
         });
+        modifiedProduct.images = imageURLs;
+        setImages(imageURLs)
+        // console.log(modifiedProduct)
+        postReq(
+          setIsLoading,
+          "/product/editproduct?request=UPDATE",
+          modifiedProduct
+        )
+          .then(() => {
+            dispatch({
+              type: actionTypes.UPDATE_PRODUCT,
+              product: modifiedProduct,
+            });
+          })
+          .catch((e) => {
+            displayError(e);
+          });
+        setIsEditing(false);
       })
-      .catch((e) => {
-        displayError(e);
+      .catch((error) => {
+        toast.error("Error uploading files: " + error);
+      })
+      .finally(() => {
+        console.log("hi");
       });
-    setIsEditing(false);
   };
 
   const handleCancel = () => {
@@ -141,10 +194,10 @@ const ProductDetail = () => {
     setUpdatedProduct({ ...product, specifications: specificationsArray });
     setIsEditing(false);
   };
-
   return isLoading ? (
     <LoadingPage />
   ) : (
+    !products? <>Error in contacting server</>:
     <div className="product-detail">
       <div className="product-detail-header">
         <h2>Product Detail</h2>
@@ -324,10 +377,10 @@ const ProductDetail = () => {
             displayName="Images"
           /> */}
           <ImageTagsInput
-        newTag={imageFiles}
-        setNewTag={setImageFiles}
-        displayName="images"
-        />
+            newTag={imageFiles? imageFiles: []}
+            setNewTag={setImageFiles}
+            displayName="images"
+          />
           <div>
             <FileUpload handleFileUpload={handleFileUpload} />
           </div>

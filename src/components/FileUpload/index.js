@@ -1,15 +1,21 @@
-import React, {useRef} from 'react';
+import React, { useState } from 'react';
 import { Button } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
-const FileUpload = ({handleFileUpload}) => {
+const FileUpload = ({ handleFileUpload }) => {
+  const [key, setKey] = useState(0); // State to reset input key
+  const handleInput = (e) => {
+    handleFileUpload(e)
+    setKey(key+1)
+  }
   return (
     <div>
       <input
+        key={key} // Reset input by changing its key
         accept="image/*"
         id="file-upload"
         type="file"
-        onChange={handleFileUpload}
+        onChange={handleInput}
         multiple
         style={{ display: 'none' }}
       />
@@ -18,19 +24,11 @@ const FileUpload = ({handleFileUpload}) => {
           variant="outlined"
           component="span"
           startIcon={<CloudUploadIcon fontSize="large" />}
-          sx={{ mb: 2, mr: 2 }} 
+          sx={{ mb: 2, mr: 2 }}
         >
           Add Images
         </Button>
       </label>
-      {/* <Button
-        variant="outlined"
-        color="primary"
-        onClick={uploadFiles}
-        sx={{ mb: 2, mr: 2 }}
-      >
-        Upload
-      </Button> */}
     </div>
   );
 };

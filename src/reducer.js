@@ -15,6 +15,7 @@ export const actionTypes = {
   USER_LOGIN: 'USER_LOGIN',
   USER_LOGOUT: 'USER_LOGOUT',
   EDIT_ADDRESS: 'EDIT_ADDRESS',
+  UPDATE_PRODUCT: 'UPDATE_PRODUCT',
 };
 
 const reducer = (state, action) => {
@@ -74,7 +75,14 @@ const reducer = (state, action) => {
           addresses: [action.address],
         },
       };
-    
+    case actionTypes.UPDATE_PRODUCT: {
+      const newProducts = state.products.filter((product) => product.id!==action.product.id)
+      newProducts.push(action.product)
+      return {
+        ...state,
+        products: newProducts,
+      }
+    }
     default:
       return state;
   }
