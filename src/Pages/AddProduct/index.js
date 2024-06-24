@@ -61,13 +61,7 @@ const AddProduct = () => {
   };
 
   const handleSave = () => {
-    const specificationsObject = newProduct.specifications.reduce(
-      (acc, { key, value }) => {
-        acc[key] = value;
-        return acc;
-      },
-      {}
-    );
+   
 
     const category =
       newProduct.category === "Other"
@@ -78,7 +72,7 @@ const AddProduct = () => {
       formData.append("image", file);
     });
     // uploadFiles()
-
+    // console.log(imageFiles)
     postReq(setIsLoading, `/product/uploadimages`, formData, 'multipart/form-data')
       .then((responseData) => {
         // console.log("Files uploaded successfully:", response.data);
@@ -87,6 +81,13 @@ const AddProduct = () => {
           imageURLs.push(`${process.env.REACT_APP_API_URL}${path}`)
         })
         newProduct.images = imageURLs
+        const specificationsObject = newProduct.specifications.reduce(
+          (acc, { key, value }) => {
+            acc[key] = value;
+            return acc;
+          },
+          {}
+        );
         const modifiedProduct = {
           ...newProduct,
           price: Number(newProduct.price),
@@ -121,7 +122,7 @@ const AddProduct = () => {
   };
   const [tags, setTags] = useState([]);
   const [keyFeatures, setKeyFeatures] = useState([]);
-  const [images, setImages] = useState([]);
+  // const [images, setImages] = useState([]);
   // const [imageNames, setImageNames] = useState([])
   const [imageFiles, setImageFiles] = useState([]);
   const handleFileUpload = (e) => {
@@ -131,30 +132,31 @@ const AddProduct = () => {
       newImageNames.push(file.name)
     })
     // setImageNames([...imageNames, ...newImageNames])
+    console.log(imageFiles, files)
     setImageFiles([...imageFiles, ...files]);
     // console.log(imageFiles)
   };
   // console.log(imageFiles)
-  const uploadFiles = () => {
-    const formData = new FormData();
-    imageFiles.forEach((file) => {
-      formData.append("image", file);
-    });
-    axios
-      .post(`${process.env.REACT_APP_API_URL}/product/uploadimages`, formData)
-      .then((response) => {
-        // console.log("Files uploaded successfully:", response.data);
-        const imageURLs = []
-        response.data.forEach(path => {
-          imageURLs.push(`${process.env.REACT_APP_API_URL}${path}`)
-        })
-        setImages(imageURLs)
-      })
-      .catch((error) => {
-        toast.error("Error uploading files: "+ error);
-      })
-      .finally(() =>{console.log('hi')})
-  };
+  // const uploadFiles = () => {
+  //   const formData = new FormData();
+  //   imageFiles.forEach((file) => {
+  //     formData.append("image", file);
+  //   });
+  //   axios
+  //     .post(`${process.env.REACT_APP_API_URL}/product/uploadimages`, formData)
+  //     .then((response) => {
+  //       // console.log("Files uploaded successfully:", response.data);
+  //       const imageURLs = []
+  //       response.data.forEach(path => {
+  //         imageURLs.push(`${process.env.REACT_APP_API_URL}${path}`)
+  //       })
+  //       setImages(imageURLs)
+  //     })
+  //     .catch((error) => {
+  //       toast.error("Error uploading files: "+ error);
+  //     })
+  //     .finally(() =>{console.log('hi')})
+  // };
   return isLoading ? (
     <LoadingPage />
   ) : (

@@ -1,9 +1,8 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import { Button } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 const FileUpload = ({handleFileUpload}) => {
-
   return (
     <div>
       <input
@@ -19,7 +18,7 @@ const FileUpload = ({handleFileUpload}) => {
           variant="outlined"
           component="span"
           startIcon={<CloudUploadIcon fontSize="large" />}
-          sx={{ mb: 2, mr: 2 }} // Adding margin bottom and right using sx prop
+          sx={{ mb: 2, mr: 2 }} 
         >
           Add Images
         </Button>
