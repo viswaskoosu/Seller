@@ -7,8 +7,9 @@ import { actionTypes } from "../../reducer";
 import "./ProductDetail.css"; // Import CSS file
 import Carousel from "../../components/Carousel"; // Import Carousel component
 import ProductDetailInfo from "../ProductDetailInfo";
-import TagsInput from "../../components/TagsInput";
+import TagsInput, { ImageTagsInput } from "../../components/TagsInput";
 import { postReq, displayError } from "../../Requests";
+import FileUpload from "../../components/FileUpload";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingPage from "../LoadingPage";
@@ -24,9 +25,29 @@ const ProductDetail = () => {
   }
   const [isEditing, setIsEditing] = useState(false);
   const [updatedProduct, setUpdatedProduct] = useState({});
-  const [tags, setTags] = useState(product? product.tags: []);
-  const [keyFeatures, setKeyFeatures] = useState(product? product.keyFeatures: []);
-  const [images, setImages] = useState(product? product.images: []);
+  const [tags, setTags] = useState(product ? product.tags : []);
+  const [keyFeatures, setKeyFeatures] = useState(
+    product ? product.keyFeatures : []
+  );
+  const [images, setImages] = useState(product ? product.images : []);
+  // const [imageNames, setImageNames] = useState(
+  //   product
+  //     ? product.images.map((url) => {
+  //         const pathname = new URL(url).pathname;
+  //         return pathname.substring(pathname.lastIndexOf("/") + 1);
+  //       })
+  //     : []
+  // );
+  const [imageFiles, setImageFiles] = useState(product? product.images.map((url) => {
+    const pathname = new URL(url).pathname;
+    return {name: pathname.substring(pathname.lastIndexOf("/") + 1)}
+  }):[]);
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
+    // setImageNames([...imageNames, ...newImageNames])
+    setImageFiles([...imageFiles, ...files]);
+    // console.log(imageFiles)
+  };
   useEffect(() => {
     if (product) {
       // Convert specifications object to an array of key-value pairs
@@ -87,6 +108,7 @@ const ProductDetail = () => {
       },
       {}
     );
+    // const filteredImages = 
     const modifiedProduct = {
       ...updatedProduct,
       specifications: specificationsObject,
@@ -294,13 +316,21 @@ const ProductDetail = () => {
               className='resize-textarea'
             />
           </div> */}
-          <TagsInput
-            newTag={images}
-            setNewTag={setImages}
+          {/* <TagsInput
+            newTag={imageNames}
+            setNewTag={setImageNames}
             handleInputChange={handleInputChange}
             name="images"
             displayName="Images"
-          />
+          /> */}
+          <ImageTagsInput
+        newTag={imageFiles}
+        setNewTag={setImageFiles}
+        displayName="images"
+        />
+          <div>
+            <FileUpload handleFileUpload={handleFileUpload} />
+          </div>
           <button className="save-button" onClick={handleSave}>
             Save
           </button>
