@@ -4,13 +4,19 @@ import './YourProducts.css';
 import { useStateValue } from '../../Context/StateProvider';
 import {useNavigate} from 'react-router-dom'
 const YourProducts = () => {
-  const [{ products }, dispatch] = useStateValue();
+  const [{userLoggedIn, products }, dispatch] = useStateValue();
   // console.log(products)
   const sellerId = '666b3653a34c6e81d0f94b0e';
   const [filteredProducts, setFilteredProducts] = useState([]);
 
   const [sortBy, setSortBy] = useState('');
   const navigate = useNavigate()
+  useEffect(() => {
+    if (!userLoggedIn){
+      navigate('/signin')
+    }
+  }, [userLoggedIn])
+  
   useEffect(() => {
     // const sellerProducts = products.filter(product => product.seller === sellerId);
     const sellerProducts = products
@@ -74,7 +80,7 @@ const YourProducts = () => {
   const handleAddProduct = () => {
     navigate('/addproduct')
   }
-  return (
+  return (!userLoggedIn? <></>:
     <div className="your-products">
       <div className="filters">
         <h2>Sort By</h2>

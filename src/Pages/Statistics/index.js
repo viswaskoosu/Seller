@@ -4,11 +4,20 @@ import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, ArcElement, Title, Tooltip, Legend, PointElement } from 'chart.js';
 import './Statistics.css';
 import { Link } from 'react-router-dom';
-
+import { useStateValue } from '../../Context/StateProvider';
+import {useNavigate} from 'react-router-dom'
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, ArcElement, Title, Tooltip, Legend, PointElement);
 
 function Statistics() {
+  const [{userLoggedIn }] = useStateValue();
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (!userLoggedIn){
+      navigate('/signin')
+    }
+  }, [userLoggedIn])
+  
   const [filter, setFilter] = useState('1year');
   const [customYear, setCustomYear] = useState(new Date().getFullYear().toString());
   const [filteredSalesData, setFilteredSalesData] = useState([]);
@@ -257,7 +266,7 @@ function Statistics() {
   const mostAmountSold = productSales.reduce((max, product) => (product.totalAmount > max.totalAmount ? product : max), { totalAmount: -Infinity });
   const leastAmountSold = productSales.reduce((min, product) => (product.totalAmount < min.totalAmount ? product : min), { totalAmount: Infinity });
 
-  return (
+  return (!userLoggedIn? <></>:
     <div className="statistics">
       <div className="filter-section">
         <label htmlFor="filter">Filter:</label>

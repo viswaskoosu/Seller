@@ -8,10 +8,15 @@ import { useStateValue } from '../../Context/StateProvider';
 import { AccountCircle, Equalizer, ShoppingCart, History, Mail, Payment, LocationOn, ContactSupport } from '@mui/icons-material';
 
 function SellerAccountPage() {
-  const [{ user }, dispatch] = useStateValue();
+  const [{ user, userLoggedIn }, dispatch] = useStateValue();
   const [image, setImage] = useState(""); 
   const navigate = useNavigate();
-
+  useEffect(() => {
+    if (!userLoggedIn){
+      navigate('/signin')
+    }
+  }, [userLoggedIn])
+  
   const logout = () => {
     localStorage.removeItem("user");
     dispatch({
@@ -39,7 +44,7 @@ function SellerAccountPage() {
     checkDP();
   }, [user]);
 
-  return (
+  return (!userLoggedIn? <></>:
     <>
       <div className="profile-section" style={{ height: user ? 'fit-content' : '70vh' }}>
         <div className={`account-section ${user ? 'animate' : ''}`}>

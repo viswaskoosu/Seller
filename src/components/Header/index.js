@@ -9,7 +9,7 @@ import ProductsIcon from '@mui/icons-material/Category';
 import HistoryIcon from '@mui/icons-material/History';
 import AccountIcon from '@mui/icons-material/AccountCircle';
 import StatisticsIcon from '@mui/icons-material/BarChart';
-
+import {useStateValue} from '../../Context/StateProvider'
 const mainSections = [
   { label: 'Your Products', link: '/your-products', icon: <ProductsIcon /> },
   { label: 'Selling History', link: '/selling-history', icon: <HistoryIcon /> },
@@ -20,6 +20,7 @@ const mainSections = [
 function Header() {
   const [anchorElNav] = React.useState(null);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [{userLoggedIn}] = useStateValue()
   const navigate = useNavigate();
 
   const handleSearch = () => {

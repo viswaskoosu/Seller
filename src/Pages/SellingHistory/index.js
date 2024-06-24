@@ -3,8 +3,18 @@ import { Link } from 'react-router-dom';
 import './SellingHistory.css';
 import dummySellingHistory from '../../dummySellingHistory';
 import Header from '../../components/Header';
-
+import { useStateValue } from '../../Context/StateProvider';
+import {useNavigate} from 'react-router-dom'
 function SellingHistory() {
+  const [{userLoggedIn }] = useStateValue();
+
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (!userLoggedIn){
+      navigate('/signin')
+    }
+  }, [userLoggedIn])
+  
   const [sellingHistory, setSellingHistory] = useState(dummySellingHistory);
   const [filteredHistory, setFilteredHistory] = useState([]);
   const [filter, setFilter] = useState('all');
@@ -84,7 +94,7 @@ function SellingHistory() {
     }
   };
 
-  return (
+  return (!userLoggedIn? <></>:
     <div className='selling'>
       {/* <Header /> */}
       <div className="selling-history-container">
