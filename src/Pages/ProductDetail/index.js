@@ -18,6 +18,7 @@ const ProductDetail = () => {
   const { productId } = useParams();
   const [{ products }, dispatch] = useStateValue();
   const product = products.find((prod) => prod.id === productId);
+  // console.log(product)
   if (!product) {
     if (isLoading === false) setIsLoading(true);
   } else {
@@ -30,14 +31,14 @@ const ProductDetail = () => {
     product ? product.keyFeatures : []
   );
   const [images, setImages] = useState(product ? product.images : []);
-  const [imageNames, setImageNames] = useState(
-    product
-      ? product.images.map((url) => {
-          const pathname = new URL(url).pathname;
-          return pathname.substring(pathname.lastIndexOf("/") + 1);
-        })
-      : []
-  );
+  // const [imageNames, setImageNames] = useState(
+  //   product
+  //     ? product.images.map((url) => {
+  //         const pathname = new URL(url).pathname;
+  //         return pathname.substring(pathname.lastIndexOf("/") + 1);
+  //       })
+  //     : []
+  // );
   const [imageFiles, setImageFiles] = useState(
     product
       ? product.images.map((url) => {
@@ -47,11 +48,13 @@ const ProductDetail = () => {
       :
        []
   );
+  // const [t, st] = useState([])
+  // console.log(imageFiles)
   useEffect(() => {
-    if (product?.images.length===0){
+    if (product && images.length===0){
       setImages(product.images)
     }
-    if  (imageFiles?.length===0){
+    if  (product && imageFiles.length===0){
       setImageFiles(product?.images.map((url) => {
         const pathname = new URL(url).pathname;
         return { name: pathname.substring(pathname.lastIndexOf("/") + 1) };
