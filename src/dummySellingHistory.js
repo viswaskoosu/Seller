@@ -11,7 +11,7 @@ const dummySellingHistory = [
       {
         productId: '6673be3a65bc991223ec3955',
         title: 'LED Bulb',
-        orderStatus: 1, // Delivered
+        deliveryStatus: 1, // Delivered
         quantity: 1,
         soldDate: new Date('2022-05-15').getTime(),
         buyer: {
@@ -25,7 +25,7 @@ const dummySellingHistory = [
       {
         productId: '6673be3a65bc991223ec3955',
         title: 'LED Bulb',
-        orderStatus: 1, // Delivered
+        deliveryStatus: 1, // Delivered
         quantity: 1,
         soldDate: new Date('2021-05-15').getTime(),
         buyer: {
@@ -39,7 +39,7 @@ const dummySellingHistory = [
       {
         productId: '6673be3a65bc991223ec3955',
         title: 'LED Bulb',
-        orderStatus: 1, // Delivered
+        deliveryStatus: 1, // Delivered
         quantity: 1,
         soldDate: new Date('2021-05-16').getTime(),
         buyer: {
@@ -53,7 +53,7 @@ const dummySellingHistory = [
       {
         productId: '6673be3a65bc991223ec3955',
         title: 'LED Bulb',
-        orderStatus: 1, // Delivered
+        deliveryStatus: 1, // Delivered
         quantity: 3,
         soldDate: new Date('2024-05-17').getTime(),
         buyer: {
@@ -78,7 +78,7 @@ const dummySellingHistory = [
       {
         productId: '6673be3a65bc991223ec3973',
         title: 'HDPE Pipes',
-        orderStatus: 1, // Delivered
+        deliveryStatus: 1, // Delivered
         quantity: 2,
         soldDate: new Date('2023-07-20').getTime(),
         buyer: {
@@ -92,7 +92,7 @@ const dummySellingHistory = [
       {
         productId: '6673be3a65bc991223ec3973',
         title: 'HDPE Pipes',
-        orderStatus: -1, // Not Yet Shipped
+        deliveryStatus: -1, // Not Yet Shipped
         quantity: 1,
         soldDate: new Date('2024-03-10').getTime(),
         buyer: {
@@ -117,7 +117,7 @@ const dummySellingHistory = [
       {
         productId: '6673be3a65bc991223ec3975',
         title: 'FRP Pipes',
-        orderStatus: 0, // Shipped
+        deliveryStatus: 0, // Shipped
         quantity: 1,
         soldDate: new Date('2023-09-05').getTime(),
         buyer: {
@@ -142,7 +142,7 @@ const dummySellingHistory = [
       {
         productId: '6673be3a65bc991223ec3977',
         title: 'HDPE Sprinkler Pipes',
-        orderStatus: 1, // Delivered
+        deliveryStatus: 1, // Delivered
         quantity: 3,
         soldDate: new Date('2023-11-15').getTime(),
         buyer: {
@@ -156,7 +156,7 @@ const dummySellingHistory = [
       {
         productId: '6673be3a65bc991223ec3977',
         title: 'HDPE Sprinkler Pipes',
-        orderStatus: 1, // Delivered
+        deliveryStatus: 1, // Delivered
         quantity: 2,
         soldDate: new Date('2024-01-20').getTime(),
         buyer: {
