@@ -168,7 +168,7 @@ const SignUp = () => {
         // if (response.data.success)
         // Cookies.set("token", response.data.token)
         console.log(response.data.user);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("user", JSON.stringify({token: response.data.user.token}));
         toast.success("Signed up successfully");
         dispatch({
           type: "USER_LOGIN",

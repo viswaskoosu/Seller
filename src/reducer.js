@@ -61,13 +61,13 @@ const reducer = (state, action) => {
   userLoggedIn: false
       }
     case actionTypes.EDIT_ADDRESS:
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          ...state.user,
-          addresses: [action.address],
-        })
-      );
+      // localStorage.setItem(
+      //   "user",
+      //   JSON.stringify({
+      //     ...state.user,
+      //     addresses: [action.address],
+      //   })
+      // );
       return {
         ...state,
         user: {

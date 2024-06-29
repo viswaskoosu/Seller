@@ -83,7 +83,7 @@ const SignIn = () => {
       .post(`${process.env.REACT_APP_API_URL}/user/login`, userData)
       .then((response) => {
         // if (response.data.success) {
-          localStorage.setItem("user", JSON.stringify(response.data.user));
+          localStorage.setItem("user", JSON.stringify({token: response.data.user.token}));
           toast.success("Signed in successfully");
           dispatch({ type: actionTypes.USER_LOGIN });
           dispatch({ type: actionTypes.SET_USER, user: response.data.user });

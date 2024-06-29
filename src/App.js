@@ -55,6 +55,21 @@ function App() {
     //   .finally(() => {
     //     setIsLoading(false);
     //   });
+    getReq(setIsLoading, '/user/fetchUser', {isSeller: true})
+    .then((responseData) => {
+      console.log(responseData)
+      dispatch({
+        type: "SET_USER",
+        user: responseData.user
+      })
+    })
+    .catch((e) => {
+      setIsLoading(false);
+      window.location.replace("/error");
+    })
+    .finally(() => {
+      setIsLoading(false);
+    })
     getReq(setIsLoading, `/product/fetchproducts`)
     .then((products) => {
       dispatch({
@@ -64,7 +79,7 @@ function App() {
     })
     .catch((e) => {
       setIsLoading(false);
-      localStorage.setItem('error', e)
+      // localStorage.setItem('error', e)
       window.location.replace("/error");
     })
     .finally(() => {
