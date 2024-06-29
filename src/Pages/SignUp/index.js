@@ -22,6 +22,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { useStateValue } from "../../Context/StateProvider";
 import axios from "axios";
 import AddressTemplate from "./AddressTemplate";
+import { displayError } from "../../Requests";
+import OTPInput from "./OTP";
 const SignUp = () => {
   const navigate = useNavigate();
   const [, dispatch] = useStateValue();
@@ -113,7 +115,7 @@ const SignUp = () => {
       }
     }
     if (stage === 1) {
-      if (!/^\d+$/.test(phoneNumber) || phoneNumber.length !== 10) {
+      if (!/^\d+$/.test(phoneNumber) || phoneNumber.length !== 10 || phoneNumber[0] === "0") {
         check = check || true;
         setPhoneNumberError("Invalid Phone Number");
       } else {
@@ -147,7 +149,7 @@ const SignUp = () => {
     return check;
   };
   const handleSubmit = async () => {
-    const modifiedAddress = {...address, id: Date.now(), name: businessName}
+    const modifiedAddress = { ...address, id: Date.now(), name: businessName };
     const userData = {
       name: `${firstName} ${lastName}`,
       email: email,
@@ -156,6 +158,7 @@ const SignUp = () => {
       phone: phoneNumber,
       businessName: businessName,
       isSeller: true,
+      otp: otp,
     };
     setIsLoading(true);
     await axios
@@ -292,6 +295,25 @@ const SignUp = () => {
     }
     setAddressErrors((prevErrors) => ({ ...prevErrors, country: "" }));
   };
+  const [otpMode, setOtpMode] = useState(false);
+  const [otp, setOtp] = useState("");
+  const sendOtp = () => {
+    setIsLoading(true)
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/user/sendotp`, {
+        email: email,
+      })
+      .then(() => {
+        toast.success("OTP SENT. Check Mail");
+        setOtpMode(true);
+      })
+      .catch((e) => {
+        displayError(e);
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  };
   // console.log(email, password, firstName, lastName)
   return isLoading ? (
     <LoadingPage />
@@ -426,9 +448,9 @@ const SignUp = () => {
               onKeyDown={handleKeyDown}
               sx={{ mb: 2 }}
             />
-            <Button variant="contained" sx={{ mb: 2 }}>
+            {/* <Button variant="contained" sx={{ mb: 2 }}>
               Check Availability
-            </Button>
+            </Button> */}
             {/* <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
               <InputLabel>Select Product Category</InputLabel>
               <Select
@@ -580,7 +602,7 @@ onKeyDown={handleKeyDown}
               Email: {email}
             </Typography>
             <Typography variant="body1" gutterBottom>
-              Password: {password}
+              Password: {"*".repeat(password.length)}
             </Typography>
             <Typography variant="body1" gutterBottom>
               Phone Number: {phoneNumber}
@@ -592,7 +614,8 @@ onKeyDown={handleKeyDown}
               Product Category: {productCategory}
             </Typography> */}
             <Typography variant="body1" gutterBottom>
-              Business Address: {address.street}, {address.city}, {address.state}, {address.country}, {address.zip}
+              Business Address: {address.street}, {address.city},{" "}
+              {address.state}, {address.country}, {address.zip}
             </Typography>
             <Box
               sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}
@@ -600,14 +623,42 @@ onKeyDown={handleKeyDown}
               <Button variant="contained" onClick={handlePreviousStage}>
                 Back
               </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit}
-              >
-                Submit
-              </Button>
+              
+                <Button variant="contained" color="primary" onClick={sendOtp}>
+                  {!otpMode? "Send OTP": "Resend OTP"}
+                </Button>
+              
             </Box>
+
+            <div>
+              {otpMode ? (
+                <>
+                  <OTPInput
+                    separator={<span></span>}
+                    otp={otp}
+                    setOtp={setOtp}
+                    length={6}
+                  />
+                  {/* <span>Entered value: {otp}</span> */}
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{
+                      mt: 3,
+                      mb: 2,
+                      bgcolor: "#007bff",
+                      color: "#ffffff",
+                    }}
+                    onClick={handleSubmit}
+                  >
+                    Sign Up
+                  </Button>
+                </>
+              ) : (
+                <></>
+              )}
+            </div>
           </Box>
         )}
       </Box>
